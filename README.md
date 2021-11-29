@@ -59,7 +59,7 @@ More usage examples see in [examples](https://github.com/sergeiivankov/crypto-bo
 
 ## Documentation
 
-Library documentation can be found in [repository GitHub page](https://sergeiivankov.github.io/cryto-bot-api/). We advise you to start studying documentation with library default exported [Client class](https://sergeiivankov.github.io/cryto-bot-api/classes/Client.html).
+Library documentation can be found in [repository GitHub page](https://sergeiivankov.github.io/crypto-bot-api/). We advise you to start studying documentation with library default exported [Client class](https://sergeiivankov.github.io/crypto-bot-api/classes/Client.html).
 
 ## Building
 
