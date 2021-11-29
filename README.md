@@ -55,7 +55,7 @@ In browsers:
 
 **Important: at the time of publication of version 0.0.1 (Nov 29, 2021), test API servers do not return header Access-Control-Allow-Origin, which allows make requests to API from third-party domains, so client request from website environment won't work (but its work in browser extensions, Electron and similar apps)**
 
-More usage examples see in [examples](https://github.com/sergeiivankov/crypto-bot-api/examples) project directory.
+More usage examples see in [examples](https://github.com/sergeiivankov/crypto-bot-api/tree/main/examples) project directory.
 
 ## Documentation
 
@@ -86,8 +86,8 @@ $ npm run watch-dist
 
 ## Resources
 
-* [Examples](https://github.com/sergeiivankov/crypto-bot-api/examples)
-* [Changelog](https://github.com/sergeiivankov/crypto-bot-api/CHANGELOG.md)
+* [Examples](https://github.com/sergeiivankov/crypto-bot-api/tree/main/examples)
+* [Changelog](https://github.com/sergeiivankov/crypto-bot-api/blob/main/CHANGELOG.md)
 * [Backend CryptoBot API description](https://telegra.ph/Crypto-Pay-API-11-25)
 
 ## Code quality
