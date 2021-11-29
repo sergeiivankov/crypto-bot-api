@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "module": "CommonJS",
+    "target": "es2019",
+    "declaration": true,
+    "outDir": "./lib"
+  },
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "src/module.ts"
+  ],
+  "typedocOptions": {
+    "entryPoints": ["src/exports.ts"],
+    "out": "docs",
+    "name": "Crypto Bot API",
+    "hideGenerator": true,
+    "sort": [
+      "static-first",
+      "visibility",
+      "required-first",
+      "alphabetical"
+    ],
+    "defaultCategory": "Internal",
+    "plugin": ["nlfurniss-typedoc-plugin-sourcefile-url"],
+    "sourcefile-url-prefix": "https://github.com/sergeiivankov/crypto-bot-api/src/"
+  }
+}
