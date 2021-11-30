@@ -834,6 +834,8 @@ var CryptoBotAPI = (function () {
         return Client;
     }(Store));
 
+    // File using to generate browser bundles from ES modules export
+
     return Client;
 
 })();
