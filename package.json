@@ -1,7 +1,8 @@
 {
   "name": "crypto-bot-api",
   "version": "0.0.2",
-  "description": "",
+  "description": "Simple and minimalistic client for CryptoBot API made with love and TypeScript.",
+  "keywords": ["telegram-bot", "api-client", "cryptocurrency", "cryptobot", "ton"],
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {
