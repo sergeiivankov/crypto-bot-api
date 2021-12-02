@@ -32,7 +32,8 @@ export default [
       sourcemap: true
     },
     plugins,
-    onwarn
+    onwarn,
+    watch: { clearScreen: false }
   },
   {
     input: 'src/index.ts',
@@ -51,6 +52,7 @@ export default [
         format: { comments: false }
       })
     ],
-    onwarn
+    onwarn,
+    watch: false
   }
 ];
