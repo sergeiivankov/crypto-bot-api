@@ -1,4 +1,6 @@
-import { ApiMethod, GetInvoicesBackendOptions, isValidUrl } from '../helpers/utils';
+import {
+  ApiMethod, CreateInvoiceBackendOptions, GetInvoicesBackendOptions, isValidUrl,
+} from '../helpers/utils';
 import request from '../request/http';
 
 /**
@@ -60,18 +62,20 @@ export default class Transport {
    */
   call(
     method: ApiMethod,
-    parameters: GetInvoicesBackendOptions = {},
+    parameters?: CreateInvoiceBackendOptions | GetInvoicesBackendOptions,
   ): Promise<any> {
     // Format url query part from passed parameters object
     let qs = '';
-    Object.keys(parameters).forEach((name): void => {
-      let value = parameters[name];
+    if (parameters) {
+      Object.keys(parameters).forEach((name): void => {
+        let value = parameters[name];
 
-      if (Array.isArray(value)) value = value.join(',');
-      else value = value.toString();
+        if (Array.isArray(value)) value = value.join(',');
+        else value = value.toString();
 
-      qs += `&${name}=${encodeURIComponent(value)}`;
-    });
+        qs += `&${name}=${encodeURIComponent(value)}`;
+      });
+    }
 
     return request(this._baseUrl + method + (qs.length ? `?${qs.substr(1)}` : ''), this._apiKey)
       .then((rawResponse: string): any => {
