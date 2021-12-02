@@ -3,7 +3,7 @@ import {
   toInvoice, toInvoices, toInvoicesPaginated,
 } from '../helpers/casts';
 import {
-  CreateInvoiceOptions, GetInvoicesOptions, GetInvoicesPaginateOptions,
+  ApiMethod, CreateInvoiceOptions, GetInvoicesOptions, GetInvoicesPaginateOptions,
   getExchageRate, prepareCreateInvoiceOptions, prepareGetInvoicesOptions,
   prepareGetInvoicesPaginateOptions,
 } from '../helpers/utils';
@@ -197,5 +197,22 @@ export default class Client extends Store {
       .then((result: any): InvoicesPaginated => {
         return toInvoicesPaginated(options.page, this._pageSize, result);
       });
+  }
+
+  /**
+   * Call backend API method directly (types unsafe)
+   *
+   * Use it if backend API update (add new methods, change request or response fileds),
+   * but library is not
+   *
+   * @param method - Backend API method name
+   * @param options - Backend API options object
+   *
+   * @throws Error - If there is an error sending request to backend API or parsing response
+   *
+   * @returns Promise, what resolved to backend API response `result` field value
+   */
+  call(method: string, options: object = {}): Promise<any> {
+    return this._transport.call(method as ApiMethod, options);
   }
 }

@@ -1,6 +1,4 @@
-import {
-  ApiMethod, CreateInvoiceBackendOptions, GetInvoicesBackendOptions, isValidUrl,
-} from '../helpers/utils';
+import { ApiMethod, isValidUrl } from '../helpers/utils';
 import request from '../request/http';
 
 /**
@@ -60,10 +58,7 @@ export default class Transport {
    *
    * @returns Promise, what resolved to API response `result` field
    */
-  call(
-    method: ApiMethod,
-    parameters?: CreateInvoiceBackendOptions | GetInvoicesBackendOptions,
-  ): Promise<any> {
+  call(method: ApiMethod, parameters?: object): Promise<any> {
     // Format url query part from passed parameters object
     let qs = '';
     if (parameters) {
