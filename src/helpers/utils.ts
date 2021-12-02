@@ -10,9 +10,9 @@ export type CreateInvoiceOptions = {
   currency: InvoiceCurrency,
   /** Invoice amount */
   amount: number | string,
-  /** Invoice description, displayed to user */
+  /** Invoice description, displayed to user, up to 1024 symbols */
   description?: string,
-  /** Invoice payload, visible only for app */
+  /** Invoice payload, visible only for app, up to 4096 symbols */
   payload?: string,
   /** Url for button which will be shown when invoice was paid */
   paidBtnUrl?: string,
@@ -208,8 +208,8 @@ export const prepareCreateInvoiceOptions = (
   if (options.description && options.description.length > 1024) {
     throw new Error('Description can\'t be longer than 1024 characters');
   }
-  if (options.payload && options.payload.length > 1024) {
-    throw new Error('Payload can\'t be longer than 1024 characters');
+  if (options.payload && options.payload.length > 4096) {
+    throw new Error('Payload can\'t be longer than 4096 characters');
   }
   if (options.paidBtnName && !options.paidBtnUrl) {
     throw new Error('Require paidBtnUrl parameter if paidBtnName parameter pass');
