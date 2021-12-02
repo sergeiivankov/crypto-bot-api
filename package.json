@@ -1,8 +1,22 @@
 {
   "name": "crypto-bot-api",
   "version": "0.0.2",
-  "description": "Simple and minimalistic client for CryptoBot API made with love and TypeScript.",
-  "keywords": ["telegram-bot", "api-client", "cryptocurrency", "cryptobot", "ton"],
+  "description": "Simple and minimalistic client for Telegram CryptoBot Crypto Pay API",
+  "keywords": [
+    "crypto-bot-api",
+    "crypto-bot",
+    "crypto-pay-api",
+    "crypto-pay",
+    "api-client",
+    "crypto",
+    "cryptocurrency",
+    "exchage",
+    "payment-processing",
+    "cryptocurrency-processing",
+    "ton",
+    "the-open-network",
+    "telegram-bot"
+  ],
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {
