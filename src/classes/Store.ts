@@ -103,14 +103,14 @@ export default class Store {
   /**
    * Create class instance
    *
-   * @param key - Crypto Bot API key, looks like '1234:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
+   * @param apiKey - Crypto Bot API key, looks like '1234:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
    * @param endpoint - API endpoint url or 'mainnet' or 'testnet'
    *                   for hardcoded in library endpoint urls
    *
    * @throws Error - If passed invalid API key or endpoint
    */
-  constructor(key: string, endpoint: string = 'mainnet') {
-    this._transport = new Transport(key, endpoint);
+  constructor(apiKey: string, endpoint: string = 'mainnet') {
+    this._transport = new Transport(apiKey, endpoint);
   }
 
   /**

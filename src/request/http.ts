@@ -1,5 +1,5 @@
 import { IncomingMessage } from 'http';
-import { request as httpsRequest } from 'https';
+import { request as httpsRequest, RequestOptions } from 'https';
 
 /**
  * Make HTTP GET request
@@ -7,13 +7,18 @@ import { request as httpsRequest } from 'https';
  * Module imported for Node.js library building
  *
  * @param url - Url
+ * @param apiKey - Crypto Bot API key
  *
  * @throws Error - If request fail
  *
  * @returns Raw response text
  */
-const request = (url: string): Promise<string> => new Promise((resolve, reject) => {
-  const req = httpsRequest(url, {}, (res: IncomingMessage): void => {
+const request = (url: string, apiKey: string): Promise<string> => new Promise((resolve, reject) => {
+  const options: RequestOptions = {
+    headers: { 'Crypto-Pay-API-Token': apiKey },
+  };
+
+  const req = httpsRequest(url, options, (res: IncomingMessage): void => {
     let data = '';
 
     res.on('error', reject);
