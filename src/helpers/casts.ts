@@ -47,9 +47,8 @@ export type ExchangeRate = {
 export type ExchangeRates = ExchangeRate[];
 
 /**
- * Invoice type object for {@link Client.getInvoices}, {@link Client.getPayments},
- * {@link Client.getInvoicesPaginate}, {@link Client.createInvoice}
- * and {@link Client.confirmPayment} methods results
+ * Invoice type object for {@link Client.getInvoices}, {@link Client.getInvoicesPaginate}
+ * and {@link Client.createInvoice} methods results
  */
 export type Invoice = {
   /** Invoice identifier */
@@ -70,8 +69,6 @@ export type Invoice = {
   isAllowAnonymous: boolean,
   /** Invoice created date */
   createdAt: Date,
-  /** Is invoice confirmed by app */
-  isConfirmed: boolean,
   /** Is invoice paid anonymously, only for paid invoice */
   isPaidAnonymously?: boolean,
   /** Invoice paid date, only for paid invoice */
@@ -94,13 +91,11 @@ export type Invoice = {
    * Invoice displayed to user paid button url,
    * only if `paidBtnUrl` passed in invoice creation
    */
-  paidBtnUrl?: string,
-  /** Invoice confirmed date, only for {@link Client.confirmPayment} method result */
-  confirmedAt?: Date
+  paidBtnUrl?: string
 };
 
 /**
- * Invoices type object for {@link Client.getInvoices}, {@link Client.getPayments}
+ * Invoices type object for {@link Client.getInvoices}
  * and {@link Client.getInvoicesPaginate} methods results
  */
 export type Invoices = {
@@ -212,8 +207,7 @@ export const toExchangeRates = (input: any): ExchangeRates => {
 
 /**
  * Convert backend API result to library result object to return in
- * {@link Client.createInvoice}, {@link Client.confirmPayment} methods
- * and {@link toInvoices} function
+ * {@link Client.createInvoice} method and {@link toInvoices} function
  *
  * @param input - Backend API result
  *
@@ -230,12 +224,10 @@ export const toInvoice = (input: any): Invoice => {
     isAllowComments: input.allow_comments || false,
     isAllowAnonymous: input.allow_anonymous || false,
     createdAt: new Date(input.created_at),
-    isConfirmed: input.is_confirmed || false,
   };
 
   if (input.paid_anonymously !== undefined) invoice.isPaidAnonymously = input.paid_anonymously;
   if (input.paid_at !== undefined) invoice.paidAt = new Date(input.paid_at);
-  if (input.confirmed_at !== undefined) invoice.confirmedAt = new Date(input.confirmed_at);
   if (input.description !== undefined) invoice.description = input.description;
   if (input.payload !== undefined) invoice.payload = input.payload;
   if (input.paid_btn_name !== undefined) invoice.paidBtnName = input.paid_btn_name;
@@ -247,7 +239,7 @@ export const toInvoice = (input: any): Invoice => {
 
 /**
  * Convert backend API result to library result object to return in
- * {@link Client.getInvoices}, {@link Client.getPayments} and {@link Client.getInvoicesPaginate}
+ * {@link Client.getInvoices} and {@link Client.getInvoicesPaginate}
  * methods
  *
  * @param input - Backend API result

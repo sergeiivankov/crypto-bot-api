@@ -2,14 +2,7 @@ import { Currencies, ExchangeRates } from './casts';
 
 /** Possible backend API methods names */
 export type ApiMethod =
-  'getMe' | 'createInvoice' | 'getInvoices' | 'getPayments' | 'confirmPayment' |
-  'getBalance' | 'getExchangeRates' | 'getCurrencies';
-
-/** Backend options object type for {@link Client.getInvoices} method */
-export type ConfirmPaymentBackendOptions = {
-  /** Invoices identifier */
-  invoice_id?: number
-};
+  'getMe' | 'createInvoice' | 'getInvoices' | 'getBalance' | 'getExchangeRates' | 'getCurrencies';
 
 /** Options object type for {@link Client.createInvoice} method */
 export type CreateInvoiceOptions = {
@@ -91,27 +84,13 @@ export type GetInvoicesBackendOptions = {
   count?: number
 };
 
-/**
- * Options object type for {@link Client.getPayments} method
- *
- * @remarks
- * This type not need backend API method parameters object and convert function,
- * because in library method used same parameters names
- */
-export type GetPaymentsOptions = {
-  /** Number of payments to skip */
-  offset?: number,
-  /** Number of payments returned */
-  count?: number
-};
-
 /** Possible invoices currencies */
 export type InvoiceCurrency = 'BTC' | 'ETH' | 'TON' | 'BNB' | 'BUSD' | 'USDC' | 'USDT';
 
 /**
  * Possible invoices statuses
- * - active - Unpaid and unconfirmed invoice
- * - paid - Paid and unconfirmed invoice
+ * - active - Unpaid invoice
+ * - paid - Paid invoice
  */
 export type InvoiceStatus = 'active' | 'paid';
 

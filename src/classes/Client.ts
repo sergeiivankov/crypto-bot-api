@@ -3,7 +3,7 @@ import {
   toInvoice, toInvoices, toInvoicesPaginated,
 } from '../helpers/casts';
 import {
-  CreateInvoiceOptions, GetInvoicesOptions, GetInvoicesPaginateOptions, GetPaymentsOptions,
+  CreateInvoiceOptions, GetInvoicesOptions, GetInvoicesPaginateOptions,
   getExchageRate, prepareCreateInvoiceOptions, prepareGetInvoicesOptions,
   prepareGetInvoicesPaginateOptions,
 } from '../helpers/utils';
@@ -156,23 +156,7 @@ export default class Client extends Store {
   }
 
   /**
-   * Confirm paid invoice
-   *
-   * Use {@link toInvoice} backend API result convert function
-   *
-   * @param id - Invoice identifier
-   *
-   * @throws Error - If there is an error sending request to backend API or parsing response
-   *
-   * @returns Promise, what resolved to confirmed invoice information object
-   */
-  confirmPayment(id: number | string): Promise<Invoice> {
-    return this._transport.call('confirmPayment', { invoice_id: +id })
-      .then((result: any): Invoice => toInvoice(result));
-  }
-
-  /**
-   * Get unconfirmed (include unpaid and paid) invoices
+   * Get invoices
    *
    * Use {@link toInvoices} backend API result convert function and
    * prepare backend API parameters {@link prepareGetInvoicesOptions} function
@@ -189,27 +173,7 @@ export default class Client extends Store {
   }
 
   /**
-   * Get unconfirmed only paid invoices
-   *
-   * Use {@link toInvoices} backend API result convert function
-   *
-   * @remarks
-   * This method not need prepare backend API parameters convert function,
-   * because in library method used same parameters names like backend API method
-   *
-   * @param options - Filters options
-   *
-   * @throws Error - If there is an error sending request to backend API or parsing response
-   *
-   * @returns Promise, what resolved to invoices information object
-   */
-  getPayments(options: GetPaymentsOptions = {}): Promise<Invoices> {
-    return this._transport.call('getPayments', options)
-      .then((result: any): Invoices => toInvoices(result));
-  }
-
-  /**
-   * Get unconfirmed (include unpaid and paid) invoices paginated
+   * Get invoices paginated
    *
    * Fetch invoices with `page` options parameter, except `count` and `offset`
    *

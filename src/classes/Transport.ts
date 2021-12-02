@@ -1,7 +1,4 @@
-import {
-  ApiMethod, ConfirmPaymentBackendOptions, GetInvoicesBackendOptions,
-  GetPaymentsOptions, isValidUrl,
-} from '../helpers/utils';
+import { ApiMethod, GetInvoicesBackendOptions, isValidUrl } from '../helpers/utils';
 import request from '../request/http';
 
 /**
@@ -63,7 +60,7 @@ export default class Transport {
    */
   call(
     method: ApiMethod,
-    parameters: ConfirmPaymentBackendOptions | GetInvoicesBackendOptions | GetPaymentsOptions = {},
+    parameters: GetInvoicesBackendOptions = {},
   ): Promise<any> {
     // Format url query part from passed parameters object
     let qs = '';
