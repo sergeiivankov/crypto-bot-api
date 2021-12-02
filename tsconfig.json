@@ -9,9 +9,6 @@
   "include": [
     "src/**/*"
   ],
-  "exclude": [
-    "src/module.ts"
-  ],
   "typedocOptions": {
     "entryPoints": ["src/exports.ts"],
     "out": "docs",

@@ -5,6 +5,7 @@ import typescript from '@rollup/plugin-typescript';
 const plugins = [
   replace({
     'request/http': 'request/xhr',
+    "import Client from './classes/Client'": "import Client from './classes/Client';export default Client;",
     delimiters: ['', ''],
     preventAssignment: false
   }),
@@ -23,7 +24,7 @@ const onwarn = (message) => {
 
 export default [
   {
-    input: 'src/module.ts',
+    input: 'src/index.ts',
     output: {
       name: 'CryptoBotAPI',
       file: 'dist/crypto-bot-api.js',
@@ -34,7 +35,7 @@ export default [
     onwarn
   },
   {
-    input: 'src/module.ts',
+    input: 'src/index.ts',
     output: {
       name: 'CryptoBotAPI',
       file: 'dist/crypto-bot-api.min.js',
