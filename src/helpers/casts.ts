@@ -75,8 +75,12 @@ export type Invoice = {
   paidAt?: Date,
   /** Invoice displayed to user description, only if `description` passed in invoice creation */
   description?: string,
-  /** Invoice visible only to app payload, only if `payload` passed in invoice creation */
-  payload?: string,
+  /**
+   * Invoice visible only to app payload, only if `payload` passed in invoice creation
+   *
+   * If for invoice creation passed not string in this field, will be converted by JSON.parse
+   */
+  payload?: any,
   /**
    * Invoice left user comment, only if set `isAllowComments` to true in invoice creation
    * and user left comment
@@ -229,10 +233,20 @@ export const toInvoice = (input: any): Invoice => {
   if (input.paid_anonymously !== undefined) invoice.isPaidAnonymously = input.paid_anonymously;
   if (input.paid_at !== undefined) invoice.paidAt = new Date(input.paid_at);
   if (input.description !== undefined) invoice.description = input.description;
-  if (input.payload !== undefined) invoice.payload = input.payload;
   if (input.paid_btn_name !== undefined) invoice.paidBtnName = input.paid_btn_name;
   if (input.paid_btn_url !== undefined) invoice.paidBtnUrl = input.paid_btn_url;
   if (input.comment !== undefined) invoice.comment = input.comment;
+  if (input.payload !== undefined) {
+    let payload: any;
+
+    try {
+      payload = JSON.parse(input.payload);
+    } catch (err) {
+      payload = input.payload;
+    }
+
+    invoice.payload = payload;
+  }
 
   return invoice;
 };

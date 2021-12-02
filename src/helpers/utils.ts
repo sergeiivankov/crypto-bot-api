@@ -12,8 +12,11 @@ export type CreateInvoiceOptions = {
   amount: number | string,
   /** Invoice description, displayed to user, up to 1024 symbols */
   description?: string,
-  /** Invoice payload, visible only for app, up to 4096 symbols */
-  payload?: string,
+  /**
+   * Invoice payload, visible only for app, if it not string, JSON.stringify using
+   * for preparing to backend API parameters, may be up to 4096 symbols after preparing
+   */
+  payload?: any,
   /** Url for button which will be shown when invoice was paid */
   paidBtnUrl?: string,
   /** Text for button which will be shown when invoice was paid */
@@ -208,11 +211,18 @@ export const prepareCreateInvoiceOptions = (
   if (options.description && options.description.length > 1024) {
     throw new Error('Description can\'t be longer than 1024 characters');
   }
-  if (options.payload && options.payload.length > 4096) {
-    throw new Error('Payload can\'t be longer than 4096 characters');
-  }
   if (options.paidBtnName && !options.paidBtnUrl) {
     throw new Error('Require paidBtnUrl parameter if paidBtnName parameter pass');
+  }
+
+  let payload: string;
+  if (options.payload !== undefined) {
+    if (typeof options.payload === 'string') payload = options.payload;
+    else payload = JSON.stringify(options.payload);
+
+    if (payload.length > 4096) {
+      throw new Error('Payload can\'t be longer than 4096 characters');
+    }
   }
 
   // Create object with required parameters
@@ -223,7 +233,7 @@ export const prepareCreateInvoiceOptions = (
 
   // Same names
   if (options.description !== undefined) prepared.description = options.description;
-  if (options.payload !== undefined) prepared.payload = options.payload;
+  if (payload !== undefined) prepared.payload = payload;
 
   // Different names
   if (options.paidBtnUrl !== undefined) prepared.paid_btn_url = options.paidBtnUrl;
