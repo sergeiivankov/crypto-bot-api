@@ -11,9 +11,9 @@ import Store from './Store';
 
 /* eslint-disable tsdoc/syntax */
 /**
- * Main class for work with API
+ * Main class for work with API for browsers
  *
- * Library default export this class
+ * Library for browsers default export this class
  *
  * @category External
  */
