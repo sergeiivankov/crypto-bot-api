@@ -7,7 +7,7 @@ export { SecureContextOptions, TlsOptions } from 'tls';
 
 // eslint-disable-next-line import/prefer-default-export
 export { default as Client } from './classes/Client';
-export { default as ClientEmitter } from './classes/ClientEmitter';
+export { default as ClientEmitter, checkSignature, readRequestBody } from './classes/ClientEmitter';
 export { default as Store, createFetchHandler } from './classes/Store';
 export { default as Transport } from './classes/Transport';
 export * from './helpers/casts';
