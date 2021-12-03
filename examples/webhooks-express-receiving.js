@@ -14,7 +14,7 @@ app.use('/secret', client.middleware());
 
 // Important: at the time of publication of version 0.1.0 (Dec 4, 2021),
 // test API servers do not accept self-signed certificates
-https.createServer({
+createServer({
   key: readFileSync('/etc/letsencrypt/live/studiot.ru/privkey.pem'),
   cert: readFileSync('/etc/letsencrypt/live/studiot.ru/fullchain.pem')
 }, app).listen(443);

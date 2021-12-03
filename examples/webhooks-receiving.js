@@ -12,8 +12,6 @@ const onPaid = (invoice, requestDate) => {
 client.createServer({
   key: readFileSync(__dirname + '/server.key'),
   cert: readFileSync(__dirname + '/server.cert')
-}, {
-  port: 443
 }, '/secret-webhooks-path')
-.then(() => client.on('paid', onPaid))
-.catch(err => console.log('Create server error:', err));
+  .then(() => client.on('paid', onPaid))
+  .catch(err => console.log('Create server error:', err));
