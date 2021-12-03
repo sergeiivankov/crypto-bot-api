@@ -47,8 +47,8 @@ export type ExchangeRate = {
 export type ExchangeRates = ExchangeRate[];
 
 /**
- * Invoice type object for {@link Client.getInvoices}, {@link Client.getInvoicesPaginate}
- * and {@link Client.createInvoice} methods results
+ * Invoice type object for {@link Client.getInvoices}, {@link Client.getInvoicesPaginate},
+ * {@link Client.createInvoice} methods results and {@link ClientEmitter} `paid` event emit
  */
 export type Invoice = {
   /** Invoice identifier */
@@ -211,7 +211,8 @@ export const toExchangeRates = (input: any): ExchangeRates => {
 
 /**
  * Convert backend API result to library result object to return in
- * {@link Client.createInvoice} method and {@link toInvoices} function
+ * {@link Client.createInvoice} method, {@link toInvoices} function
+ * and {@link ClientEmitter} `paid` event emit
  *
  * @param input - Backend API result
  *
