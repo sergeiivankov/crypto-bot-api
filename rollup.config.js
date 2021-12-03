@@ -5,7 +5,7 @@ import typescript from '@rollup/plugin-typescript';
 const plugins = [
   replace({
     'request/http': 'request/xhr',
-    "import Client from './classes/Client'": "import Client from './classes/Client';export default Client;",
+    "import Client from './classes/ClientWebhookable'": "import Client from './classes/Client';export default Client;",
     delimiters: ['', ''],
     preventAssignment: false
   }),
