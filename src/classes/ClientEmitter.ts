@@ -1,13 +1,11 @@
 import { createHash, createHmac } from 'crypto';
 import { ListenOptions } from 'net';
-import {
-  IncomingMessage, RequestListener, ServerOptions, ServerResponse,
-} from 'http';
-import { Server, createServer } from 'https';
+import { IncomingMessage, RequestListener, ServerResponse } from 'http';
+import { Server, ServerOptions, createServer } from 'https';
 import Client from './Client';
 import { Invoice, toInvoice } from '../helpers/casts';
 
-const checkSignature = (
+export const checkSignature = (
   token: string, { signature, ...data }: { signature: string, data: any[] },
 ): boolean => {
   const secret = createHash('sha256').update(token).digest();
@@ -16,6 +14,37 @@ const checkSignature = (
   return signature === createHmac('sha256', secret).update(checkString).digest('hex');
 };
 
+export const readRequestBody = (
+  req: IncomingMessage,
+): Promise<any> => new Promise((resolve): void => {
+  let body: string = '';
+
+  req.on('data', (chunk: string): void => {
+    body += chunk;
+  });
+
+  req.on('end', () => {
+    let data: any;
+    try {
+      data = JSON.parse(body);
+    } catch (err) {
+      resolve(null);
+      return;
+    }
+
+    resolve(data);
+  });
+});
+
+/* eslint-disable tsdoc/syntax */
+/**
+ * Main class for work with API for Node.js
+ *
+ * Library for Node.js default export this class
+ *
+ * @category External
+ */
+/* eslint-enable tsdoc/syntax */
 class ClientEmitter extends Client {
   /** Api key */
   private _apiKey: string;
@@ -32,40 +61,19 @@ class ClientEmitter extends Client {
     this._apiKey = apiKey;
   }
 
-  createWebhooksServer(
+  createServer(
     serverOptions: ServerOptions, listenOptions: ListenOptions = { port: 443 },
     secretPath: string = '/',
   ): Promise<void> {
     return new Promise((resolve, reject) => {
       const requestListener: RequestListener = (req: IncomingMessage, res: ServerResponse) => {
         if (req.url !== secretPath) {
+          res.statusCode = 404;
           res.end();
           return;
         }
 
-        let body: string = '';
-        req.on('data', (chunk: string): void => {
-          body += chunk;
-        });
-        req.on('end', () => {
-          let data: any;
-          try {
-            data = JSON.parse(body);
-          } catch (err) {
-            res.end();
-            return;
-          }
-
-          if (!checkSignature(this._apiKey, data.invoice_paid)) {
-            res.end();
-            return;
-          }
-
-          this._emit(
-            'paid', toInvoice(data.invoice_paid), new Date(data.invoice_paid.request_date * 1000),
-          );
-          res.end();
-        });
+        readRequestBody(req).then((data: any): void => this._handleWebhook(data, res));
       };
 
       let server: Server;
@@ -89,13 +97,21 @@ class ClientEmitter extends Client {
     });
   }
 
-  closeWebhooksServer(): Promise<void> {
+  closeServer(): Promise<void> {
     return new Promise((resolve, reject) => {
       this._server.close((err?: Error): void => {
         if (err) reject(err);
         else resolve();
       });
     });
+  }
+
+  middleware(): (req: any, res: any) => void {
+    return (req: any, res: any): void => {
+      Promise.resolve()
+        .then((): any => req.body || readRequestBody(req))
+        .then((data: any): void => this._handleWebhook(data, res));
+    };
   }
 
   on(event: 'paid', listener: (invoice?: Invoice, requestDate?: Date) => any): void;
@@ -122,6 +138,25 @@ class ClientEmitter extends Client {
     this._events[event].forEach((listener: (...args: any) => any): void => {
       listener(...params);
     });
+  }
+
+  private _handleWebhook(data: any, res: ServerResponse): void {
+    if (!data) {
+      res.statusCode = 500;
+      res.end();
+      return;
+    }
+
+    if (!checkSignature(this._apiKey, data.invoice_paid)) {
+      res.statusCode = 401;
+      res.end();
+      return;
+    }
+
+    this._emit(
+      'paid', toInvoice(data.invoice_paid), new Date(data.invoice_paid.request_date * 1000),
+    );
+    res.end();
   }
 }
 
