@@ -4,16 +4,36 @@ import { IncomingMessage, RequestListener, ServerResponse } from 'http';
 import { Server, ServerOptions, createServer } from 'https';
 import Client from './Client';
 import { Invoice, toInvoice } from '../helpers/casts';
+import { Middleware } from '../helpers/utils';
 
+/* eslint-disable tsdoc/syntax */
+/**
+ * Check webhook data signature
+ *
+ * @param apiKey - Api key
+ * @param args - Request body `invoice_paid` field
+ * @param args.signature - Request body `invoice_paid` field `signature` field
+ * @param args.data - Request body `invoice_paid` field other fields
+ *
+ * @returns Checking result
+ */
+/* eslint-enable tsdoc/syntax */
 export const checkSignature = (
-  token: string, { signature, ...data }: { signature: string, data: any[] },
+  apiKey: string, { signature, ...data }: { signature: string, data: any[] },
 ): boolean => {
-  const secret = createHash('sha256').update(token).digest();
+  const secret = createHash('sha256').update(apiKey).digest();
   const checkString = Object.keys(data).sort().map((k) => `${k}=${data[k]}`).join('\n');
 
   return signature === createHmac('sha256', secret).update(checkString).digest('hex');
 };
 
+/**
+ * Read and parsing to JSON request body
+ *
+ * @param req - Node.js built-in IncomingMessage object
+ *
+ * @returns Promise, what resolved to parsed body or `null` for parsing error
+ */
 export const readRequestBody = (
   req: IncomingMessage,
 ): Promise<any> => new Promise((resolve): void => {
@@ -49,8 +69,10 @@ class ClientEmitter extends Client {
   /** Api key */
   private _apiKey: string;
 
+  /** Handling webhooks created Node.js built-in server */
   private _server: Server;
 
+  /** Event listeners store */
   private _events: { [key: string]: Array<(...args: any) => any> } = {};
 
   /* eslint-disable tsdoc/syntax */
@@ -61,9 +83,23 @@ class ClientEmitter extends Client {
     this._apiKey = apiKey;
   }
 
+  /**
+   * Create handling webhooks server
+   *
+   * Important: at the time of publication of version 0.1.0 (Dec 4, 2021),
+   * test API servers do not accept self-signed certificates
+   *
+   * @param serverOptions - Node.js built-in server options
+   * @param secretPath - Webhooks secret path, processing webhooks takes place only on it
+   * @param listenOptions - Node.js built-in server listen options
+   *
+   * @throws Error - If create server error
+   *
+   * @returns Promise, what resolved `void`
+   */
   createServer(
-    serverOptions: ServerOptions, listenOptions: ListenOptions = { port: 443 },
-    secretPath: string = '/',
+    serverOptions: ServerOptions, secretPath: string = '/',
+    listenOptions: ListenOptions = { port: 443 },
   ): Promise<void> {
     return new Promise((resolve, reject) => {
       const requestListener: RequestListener = (req: IncomingMessage, res: ServerResponse) => {
@@ -97,7 +133,16 @@ class ClientEmitter extends Client {
     });
   }
 
+  /**
+   * Close created handling webhooks server
+   *
+   * @throws Error - If server not was started or closing error
+   *
+   * @returns Promise, what resolved `void`
+   */
   closeServer(): Promise<void> {
+    if (!this._server) return Promise.reject(new Error('Server not started'));
+
     return new Promise((resolve, reject) => {
       this._server.close((err?: Error): void => {
         if (err) reject(err);
@@ -106,7 +151,12 @@ class ClientEmitter extends Client {
     });
   }
 
-  middleware(): (req: any, res: any) => void {
+  /**
+   * Create middleware function for Express.js-like API
+   *
+   * @returns Middleware function
+   */
+  middleware(): Middleware {
     return (req: any, res: any): void => {
       Promise.resolve()
         .then((): any => req.body || readRequestBody(req))
@@ -114,15 +164,41 @@ class ClientEmitter extends Client {
     };
   }
 
+  /**
+   * Subscribes to `paid` event
+   *
+   * See {@link ClientEmitter._emit} to more about event listener
+   *
+   * @param event - `paid` event name
+   * @param listener - Event listener with `invoice` and `requestDate` callback parameters
+   */
   on(event: 'paid', listener: (invoice?: Invoice, requestDate?: Date) => any): void;
 
+  /**
+   * Subscribes to event
+   *
+   * @param event - Event name
+   * @param listener - Event listener
+   */
   on(event: string, listener: (...args: any) => any): void {
     if (!this._events[event]) this._events[event] = [];
     this._events[event].push(listener);
   }
 
+  /**
+   * Unsubscribes from `paid` event
+   *
+   * @param event - `paid` event name
+   * @param listener - Event listener with `invoice` and `requestDate` callback parameters
+   */
   off(event: 'paid', listener: (invoice?: Invoice, requestDate?: Date) => any): void;
 
+  /**
+   * Unsubscribes from event
+   *
+   * @param event - Event name
+   * @param listener - Event listener
+   */
   off(event: string, listener: (...args: any) => any): void {
     if (!this._events[event]) return;
 
@@ -130,8 +206,24 @@ class ClientEmitter extends Client {
     if (idx > -1) this._events[event].splice(idx, 1);
   }
 
+  /**
+   * Emit event to listeners
+   *
+   * @param event - `paid` event name
+   * @param invoice - Paid invoice information object
+   * @param requestDate - Date of occurrence of event, need to filter old event.
+   *                      If server is not available, backend API try resend webhooks by timeout,
+   *                      so when server becomes  available again, many old events
+   *                      will be sent from backend API.
+   */
   private _emit(event: 'paid', invoice: Invoice, requestDate: Date): void;
 
+  /**
+   * Emit event to listeners
+   *
+   * @param event - Event name
+   * @param params - Call event listeners parameters
+   */
   private _emit(event: string, ...params: any): void {
     if (!this._events[event]) return;
 
@@ -140,6 +232,12 @@ class ClientEmitter extends Client {
     });
   }
 
+  /**
+   * Handling webhook data, send response and emit events
+   *
+   * @param data - Parsed request body
+   * @param res - Node.js built-in ServerResponse object
+   */
   private _handleWebhook(data: any, res: ServerResponse): void {
     if (!data) {
       res.statusCode = 500;

@@ -98,6 +98,11 @@ export type InvoiceCurrency = 'BTC' | 'ETH' | 'TON' | 'BNB' | 'BUSD' | 'USDC' | 
 export type InvoiceStatus = 'active' | 'paid';
 
 /**
+ * Express.js-like API middleware handler
+ */
+export type Middleware = (req: any, res: any) => void;
+
+/**
  * Paid button types, button text depends on the type
  * - viewItem - View Item
  * - openChannel - Open Channel
