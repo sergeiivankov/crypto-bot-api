@@ -7,7 +7,9 @@ const onPaid = (invoice, requestDate) => {
   console.log(requestDate, invoice);
 };
 
-client.createWebhooksServer({
+// Important: at the time of publication of version 0.1.0 (Dec 4, 2021),
+// test API servers do not accept self-signed certificates
+client.createServer({
   key: readFileSync(__dirname + '/server.key'),
   cert: readFileSync(__dirname + '/server.cert')
 }, {
