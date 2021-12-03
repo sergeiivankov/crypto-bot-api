@@ -1,21 +1,19 @@
 import { Currencies, ExchangeRates } from './casts';
 /** Possible backend API methods names */
-export declare type ApiMethod = 'getMe' | 'createInvoice' | 'getInvoices' | 'getPayments' | 'confirmPayment' | 'getBalance' | 'getExchangeRates' | 'getCurrencies';
-/** Backend options object type for {@link Client.getInvoices} method */
-export declare type ConfirmPaymentBackendOptions = {
-    /** Invoices identifier */
-    invoice_id?: number;
-};
+export declare type ApiMethod = 'getMe' | 'createInvoice' | 'getInvoices' | 'getBalance' | 'getExchangeRates' | 'getCurrencies';
 /** Options object type for {@link Client.createInvoice} method */
 export declare type CreateInvoiceOptions = {
     /** Invoice currency */
     currency: InvoiceCurrency;
     /** Invoice amount */
     amount: number | string;
-    /** Invoice description, displayed to user */
+    /** Invoice description, displayed to user, up to 1024 symbols */
     description?: string;
-    /** Invoice payload, visible only for app */
-    payload?: string;
+    /**
+     * Invoice payload, visible only for app, if it not string, JSON.stringify using
+     * for preparing to backend API parameters, may be up to 4096 symbols after preparing
+     */
+    payload?: any;
     /** Url for button which will be shown when invoice was paid */
     paidBtnUrl?: string;
     /** Text for button which will be shown when invoice was paid */
@@ -81,27 +79,18 @@ export declare type GetInvoicesBackendOptions = {
     /** Number of invoices returned */
     count?: number;
 };
-/**
- * Options object type for {@link Client.getPayments} method
- *
- * @remarks
- * This type not need backend API method parameters object and convert function,
- * because in library method used same parameters names
- */
-export declare type GetPaymentsOptions = {
-    /** Number of payments to skip */
-    offset?: number;
-    /** Number of payments returned */
-    count?: number;
-};
 /** Possible invoices currencies */
 export declare type InvoiceCurrency = 'BTC' | 'ETH' | 'TON' | 'BNB' | 'BUSD' | 'USDC' | 'USDT';
 /**
  * Possible invoices statuses
- * - active - Unpaid and unconfirmed invoice
- * - paid - Paid and unconfirmed invoice
+ * - active - Unpaid invoice
+ * - paid - Paid invoice
  */
 export declare type InvoiceStatus = 'active' | 'paid';
+/**
+ * Express.js-like API middleware handler
+ */
+export declare type Middleware = (req: any, res: any) => void;
 /**
  * Paid button types, button text depends on the type
  * - viewItem - View Item

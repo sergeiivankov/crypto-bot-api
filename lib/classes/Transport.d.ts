@@ -1,22 +1,24 @@
-import { ApiMethod, ConfirmPaymentBackendOptions, GetInvoicesBackendOptions, GetPaymentsOptions } from '../helpers/utils';
+import { ApiMethod } from '../helpers/utils';
 /**
  * Make backend API calls
  */
 export default class Transport {
     /** RegExp to check API key */
     static KEY_CHECK_REGEXP: RegExp;
+    /** Api key */
+    private _apiKey;
     /** Backend API endpoint base url */
     private _baseUrl;
     /**
      * Create class instance
      *
-     * @param key - Crypto Bot API key, looks like '1234:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
+     * @param apiKey - Crypto Bot API key, looks like '1234:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
      * @param endpoint - API endpoint url or 'mainnet' or 'testnet'
      *                   for hardcoded in library endpoint urls
      *
      * @throws Error - If passed invalid API key or endpoint
      */
-    constructor(key: string, endpoint: string);
+    constructor(apiKey: string, endpoint: string);
     /**
      * Make request to backend API, handle errors and return result
      *
@@ -27,5 +29,5 @@ export default class Transport {
      *
      * @returns Promise, what resolved to API response `result` field
      */
-    call(method: ApiMethod, parameters?: ConfirmPaymentBackendOptions | GetInvoicesBackendOptions | GetPaymentsOptions): Promise<any>;
+    call(method: ApiMethod, parameters?: object): Promise<any>;
 }

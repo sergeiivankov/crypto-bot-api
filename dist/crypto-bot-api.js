@@ -124,11 +124,18 @@ var CryptoBotAPI = (function () {
         if (options.description && options.description.length > 1024) {
             throw new Error('Description can\'t be longer than 1024 characters');
         }
-        if (options.payload && options.payload.length > 1024) {
-            throw new Error('Payload can\'t be longer than 1024 characters');
-        }
         if (options.paidBtnName && !options.paidBtnUrl) {
             throw new Error('Require paidBtnUrl parameter if paidBtnName parameter pass');
+        }
+        var payload;
+        if (options.payload !== undefined) {
+            if (typeof options.payload === 'string')
+                payload = options.payload;
+            else
+                payload = JSON.stringify(options.payload);
+            if (payload.length > 4096) {
+                throw new Error('Payload can\'t be longer than 4096 characters');
+            }
         }
         // Create object with required parameters
         var prepared = {
@@ -138,8 +145,8 @@ var CryptoBotAPI = (function () {
         // Same names
         if (options.description !== undefined)
             prepared.description = options.description;
-        if (options.payload !== undefined)
-            prepared.payload = options.payload;
+        if (payload !== undefined)
+            prepared.payload = payload;
         // Different names
         if (options.paidBtnUrl !== undefined)
             prepared.paid_btn_url = options.paidBtnUrl;
@@ -279,8 +286,8 @@ var CryptoBotAPI = (function () {
     };
     /**
      * Convert backend API result to library result object to return in
-     * {@link Client.createInvoice}, {@link Client.confirmPayment} methods
-     * and {@link toInvoices} function
+     * {@link Client.createInvoice} method, {@link toInvoices} function
+     * and {@link ClientEmitter} `paid` event emit
      *
      * @param input - Backend API result
      *
@@ -297,29 +304,34 @@ var CryptoBotAPI = (function () {
             isAllowComments: input.allow_comments || false,
             isAllowAnonymous: input.allow_anonymous || false,
             createdAt: new Date(input.created_at),
-            isConfirmed: input.is_confirmed || false,
         };
         if (input.paid_anonymously !== undefined)
             invoice.isPaidAnonymously = input.paid_anonymously;
         if (input.paid_at !== undefined)
             invoice.paidAt = new Date(input.paid_at);
-        if (input.confirmed_at !== undefined)
-            invoice.confirmedAt = new Date(input.confirmed_at);
         if (input.description !== undefined)
             invoice.description = input.description;
-        if (input.payload !== undefined)
-            invoice.payload = input.payload;
         if (input.paid_btn_name !== undefined)
             invoice.paidBtnName = input.paid_btn_name;
         if (input.paid_btn_url !== undefined)
             invoice.paidBtnUrl = input.paid_btn_url;
         if (input.comment !== undefined)
             invoice.comment = input.comment;
+        if (input.payload !== undefined) {
+            var payload = void 0;
+            try {
+                payload = JSON.parse(input.payload);
+            }
+            catch (err) {
+                payload = input.payload;
+            }
+            invoice.payload = payload;
+        }
         return invoice;
     };
     /**
      * Convert backend API result to library result object to return in
-     * {@link Client.getInvoices}, {@link Client.getPayments} and {@link Client.getInvoicesPaginate}
+     * {@link Client.getInvoices} and {@link Client.getInvoicesPaginate}
      * methods
      *
      * @param input - Backend API result
@@ -373,14 +385,16 @@ var CryptoBotAPI = (function () {
      * Module imported only for browsers bundle
      *
      * @param url - Url
+     * @param apiKey - Crypto Bot API key
      *
      * @throws Error - If request fail
      *
      * @returns Raw response text
      */
-    var request = function (url) { return new Promise(function (resolve, reject) {
+    var request = function (url, apiKey) { return new Promise(function (resolve, reject) {
         var xhr = new XMLHttpRequest();
         xhr.open('GET', url, true);
+        xhr.setRequestHeader('Crypto-Pay-API-Token', apiKey);
         xhr.onreadystatechange = function () {
             if (xhr.readyState !== 4)
                 return;
@@ -399,24 +413,24 @@ var CryptoBotAPI = (function () {
         /**
          * Create class instance
          *
-         * @param key - Crypto Bot API key, looks like '1234:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
+         * @param apiKey - Crypto Bot API key, looks like '1234:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
          * @param endpoint - API endpoint url or 'mainnet' or 'testnet'
          *                   for hardcoded in library endpoint urls
          *
          * @throws Error - If passed invalid API key or endpoint
          */
-        function Transport(key, endpoint) {
-            if (!Transport.KEY_CHECK_REGEXP.test(key)) {
+        function Transport(apiKey, endpoint) {
+            if (!Transport.KEY_CHECK_REGEXP.test(apiKey)) {
                 throw new Error('API key looks like invalid');
             }
             var url;
             // Mainnet disabled during api testing stage
-            if (endpoint === 'mainnet' || endpoint === 'https://pay.crypt.bot/app') {
+            if (endpoint === 'mainnet' || endpoint === 'https://pay.crypt.bot/api') {
                 throw new Error('Mainnet disabled during api testing stage,'
                     + "pass 'testnet' or endpoint url in second parameter");
             }
             else if (endpoint === 'testnet') {
-                url = 'https://testnet-pay.crypt.bot/app';
+                url = 'https://testnet-pay.crypt.bot/api';
             }
             else if (!isValidUrl(endpoint)) {
                 throw new Error('Endpoint parameter not contain valid URL');
@@ -424,7 +438,8 @@ var CryptoBotAPI = (function () {
             else {
                 url = endpoint;
             }
-            this._baseUrl = "".concat(url).concat(key, "/");
+            this._apiKey = apiKey;
+            this._baseUrl = "".concat(url, "/");
         }
         /**
          * Make request to backend API, handle errors and return result
@@ -437,18 +452,19 @@ var CryptoBotAPI = (function () {
          * @returns Promise, what resolved to API response `result` field
          */
         Transport.prototype.call = function (method, parameters) {
-            if (parameters === void 0) { parameters = {}; }
             // Format url query part from passed parameters object
             var qs = '';
-            Object.keys(parameters).forEach(function (name) {
-                var value = parameters[name];
-                if (Array.isArray(value))
-                    value = value.join(',');
-                else
-                    value = value.toString();
-                qs += "&".concat(name, "=").concat(encodeURIComponent(value));
-            });
-            return request(this._baseUrl + method + (qs.length ? "?".concat(qs.substr(1)) : ''))
+            if (parameters) {
+                Object.keys(parameters).forEach(function (name) {
+                    var value = parameters[name];
+                    if (Array.isArray(value))
+                        value = value.join(',');
+                    else
+                        value = value.toString();
+                    qs += "&".concat(name, "=").concat(encodeURIComponent(value));
+                });
+            }
+            return request(this._baseUrl + method + (qs.length ? "?".concat(qs.substr(1)) : ''), this._apiKey)
                 .then(function (rawResponse) {
                 var response;
                 try {
@@ -532,15 +548,15 @@ var CryptoBotAPI = (function () {
         /**
          * Create class instance
          *
-         * @param key - Crypto Bot API key, looks like '1234:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
+         * @param apiKey - Crypto Bot API key, looks like '1234:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
          * @param endpoint - API endpoint url or 'mainnet' or 'testnet'
          *                   for hardcoded in library endpoint urls
          *
          * @throws Error - If passed invalid API key or endpoint
          */
-        function Store(key, endpoint) {
+        function Store(apiKey, endpoint) {
             if (endpoint === void 0) { endpoint = 'mainnet'; }
-            this._transport = new Transport(key, endpoint);
+            this._transport = new Transport(apiKey, endpoint);
         }
         /**
          * Get API supported currencies infomation
@@ -605,9 +621,9 @@ var CryptoBotAPI = (function () {
 
     /* eslint-disable tsdoc/syntax */
     /**
-     * Main class for work with API
+     * Main class for work with API for browsers
      *
-     * Library default export this class
+     * Library for browsers default export this class
      *
      * @category External
      */
@@ -753,22 +769,7 @@ var CryptoBotAPI = (function () {
                 .then(function (result) { return toInvoice(result); });
         };
         /**
-         * Confirm paid invoice
-         *
-         * Use {@link toInvoice} backend API result convert function
-         *
-         * @param id - Invoice identifier
-         *
-         * @throws Error - If there is an error sending request to backend API or parsing response
-         *
-         * @returns Promise, what resolved to confirmed invoice information object
-         */
-        Client.prototype.confirmPayment = function (id) {
-            return this._transport.call('confirmPayment', { invoice_id: +id })
-                .then(function (result) { return toInvoice(result); });
-        };
-        /**
-         * Get unconfirmed (include unpaid and paid) invoices
+         * Get invoices
          *
          * Use {@link toInvoices} backend API result convert function and
          * prepare backend API parameters {@link prepareGetInvoicesOptions} function
@@ -785,27 +786,7 @@ var CryptoBotAPI = (function () {
                 .then(function (result) { return toInvoices(result); });
         };
         /**
-         * Get unconfirmed only paid invoices
-         *
-         * Use {@link toInvoices} backend API result convert function
-         *
-         * @remarks
-         * This method not need prepare backend API parameters convert function,
-         * because in library method used same parameters names like backend API method
-         *
-         * @param options - Filters options
-         *
-         * @throws Error - If there is an error sending request to backend API or parsing response
-         *
-         * @returns Promise, what resolved to invoices information object
-         */
-        Client.prototype.getPayments = function (options) {
-            if (options === void 0) { options = {}; }
-            return this._transport.call('getPayments', options)
-                .then(function (result) { return toInvoices(result); });
-        };
-        /**
-         * Get unconfirmed (include unpaid and paid) invoices paginated
+         * Get invoices paginated
          *
          * Fetch invoices with `page` options parameter, except `count` and `offset`
          *
@@ -831,10 +812,25 @@ var CryptoBotAPI = (function () {
                 return toInvoicesPaginated(options.page, _this._pageSize, result);
             });
         };
+        /**
+         * Call backend API method directly (types unsafe)
+         *
+         * Use it if backend API update (add new methods, change request or response fileds),
+         * but library is not
+         *
+         * @param method - Backend API method name
+         * @param options - Backend API options object
+         *
+         * @throws Error - If there is an error sending request to backend API or parsing response
+         *
+         * @returns Promise, what resolved to backend API response `result` field value
+         */
+        Client.prototype.call = function (method, options) {
+            if (options === void 0) { options = {}; }
+            return this._transport.call(method, options);
+        };
         return Client;
     }(Store));
-
-    // File using to generate browser bundles from ES modules export
 
     return Client;
 

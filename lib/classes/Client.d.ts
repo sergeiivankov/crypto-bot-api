@@ -1,10 +1,10 @@
 import { Balances, Currency, Invoice, Invoices, InvoicesPaginated } from '../helpers/casts';
-import { CreateInvoiceOptions, GetInvoicesOptions, GetInvoicesPaginateOptions, GetPaymentsOptions } from '../helpers/utils';
+import { CreateInvoiceOptions, GetInvoicesOptions, GetInvoicesPaginateOptions } from '../helpers/utils';
 import Store from './Store';
 /**
- * Main class for work with API
+ * Main class for work with API for browsers
  *
- * Library default export this class
+ * Library for browsers default export this class
  *
  * @category External
  */
@@ -99,19 +99,7 @@ export default class Client extends Store {
      */
     createInvoice(options: CreateInvoiceOptions): Promise<Invoice>;
     /**
-     * Confirm paid invoice
-     *
-     * Use {@link toInvoice} backend API result convert function
-     *
-     * @param id - Invoice identifier
-     *
-     * @throws Error - If there is an error sending request to backend API or parsing response
-     *
-     * @returns Promise, what resolved to confirmed invoice information object
-     */
-    confirmPayment(id: number | string): Promise<Invoice>;
-    /**
-     * Get unconfirmed (include unpaid and paid) invoices
+     * Get invoices
      *
      * Use {@link toInvoices} backend API result convert function and
      * prepare backend API parameters {@link prepareGetInvoicesOptions} function
@@ -124,23 +112,7 @@ export default class Client extends Store {
      */
     getInvoices(options?: GetInvoicesOptions): Promise<Invoices>;
     /**
-     * Get unconfirmed only paid invoices
-     *
-     * Use {@link toInvoices} backend API result convert function
-     *
-     * @remarks
-     * This method not need prepare backend API parameters convert function,
-     * because in library method used same parameters names like backend API method
-     *
-     * @param options - Filters options
-     *
-     * @throws Error - If there is an error sending request to backend API or parsing response
-     *
-     * @returns Promise, what resolved to invoices information object
-     */
-    getPayments(options?: GetPaymentsOptions): Promise<Invoices>;
-    /**
-     * Get unconfirmed (include unpaid and paid) invoices paginated
+     * Get invoices paginated
      *
      * Fetch invoices with `page` options parameter, except `count` and `offset`
      *
@@ -157,4 +129,18 @@ export default class Client extends Store {
      * @returns Promise, what resolved to invoices information object
      */
     getInvoicesPaginate(options?: GetInvoicesPaginateOptions): Promise<InvoicesPaginated>;
+    /**
+     * Call backend API method directly (types unsafe)
+     *
+     * Use it if backend API update (add new methods, change request or response fileds),
+     * but library is not
+     *
+     * @param method - Backend API method name
+     * @param options - Backend API options object
+     *
+     * @throws Error - If there is an error sending request to backend API or parsing response
+     *
+     * @returns Promise, what resolved to backend API response `result` field value
+     */
+    call(method: string, options?: object): Promise<any>;
 }

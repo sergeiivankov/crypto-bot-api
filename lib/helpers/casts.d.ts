@@ -42,9 +42,8 @@ export declare type ExchangeRate = {
 /** Result type for {@link Store.getExchangeRates} method */
 export declare type ExchangeRates = ExchangeRate[];
 /**
- * Invoice type object for {@link Client.getInvoices}, {@link Client.getPayments},
- * {@link Client.getInvoicesPaginate}, {@link Client.createInvoice}
- * and {@link Client.confirmPayment} methods results
+ * Invoice type object for {@link Client.getInvoices}, {@link Client.getInvoicesPaginate},
+ * {@link Client.createInvoice} methods results and {@link ClientEmitter} `paid` event emit
  */
 export declare type Invoice = {
     /** Invoice identifier */
@@ -65,16 +64,18 @@ export declare type Invoice = {
     isAllowAnonymous: boolean;
     /** Invoice created date */
     createdAt: Date;
-    /** Is invoice confirmed by app */
-    isConfirmed: boolean;
     /** Is invoice paid anonymously, only for paid invoice */
     isPaidAnonymously?: boolean;
     /** Invoice paid date, only for paid invoice */
     paidAt?: Date;
     /** Invoice displayed to user description, only if `description` passed in invoice creation */
     description?: string;
-    /** Invoice visible only to app payload, only if `payload` passed in invoice creation */
-    payload?: string;
+    /**
+     * Invoice visible only to app payload, only if `payload` passed in invoice creation
+     *
+     * If for invoice creation passed not string in this field, will be converted by JSON.parse
+     */
+    payload?: any;
     /**
      * Invoice left user comment, only if set `isAllowComments` to true in invoice creation
      * and user left comment
@@ -90,11 +91,9 @@ export declare type Invoice = {
      * only if `paidBtnUrl` passed in invoice creation
      */
     paidBtnUrl?: string;
-    /** Invoice confirmed date, only for {@link Client.confirmPayment} method result */
-    confirmedAt?: Date;
 };
 /**
- * Invoices type object for {@link Client.getInvoices}, {@link Client.getPayments}
+ * Invoices type object for {@link Client.getInvoices}
  * and {@link Client.getInvoicesPaginate} methods results
  */
 export declare type Invoices = {
@@ -156,8 +155,8 @@ export declare const toCurrencies: (input: any) => Currencies;
 export declare const toExchangeRates: (input: any) => ExchangeRates;
 /**
  * Convert backend API result to library result object to return in
- * {@link Client.createInvoice}, {@link Client.confirmPayment} methods
- * and {@link toInvoices} function
+ * {@link Client.createInvoice} method, {@link toInvoices} function
+ * and {@link ClientEmitter} `paid` event emit
  *
  * @param input - Backend API result
  *
@@ -166,7 +165,7 @@ export declare const toExchangeRates: (input: any) => ExchangeRates;
 export declare const toInvoice: (input: any) => Invoice;
 /**
  * Convert backend API result to library result object to return in
- * {@link Client.getInvoices}, {@link Client.getPayments} and {@link Client.getInvoicesPaginate}
+ * {@link Client.getInvoices} and {@link Client.getInvoicesPaginate}
  * methods
  *
  * @param input - Backend API result

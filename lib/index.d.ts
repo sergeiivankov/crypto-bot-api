@@ -1,2 +1,2 @@
-import Client from './classes/Client';
+import Client from './classes/ClientEmitter';
 export = Client;

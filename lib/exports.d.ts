@@ -1,4 +1,9 @@
+export { ListenOptions } from 'net';
+export { ServerOptions as httpServerOptions } from 'http';
+export { Server, ServerOptions } from 'https';
+export { SecureContextOptions, TlsOptions } from 'tls';
 export { default as Client } from './classes/Client';
+export { default as ClientEmitter, checkSignature, readRequestBody } from './classes/ClientEmitter';
 export { default as Store, createFetchHandler } from './classes/Store';
 export { default as Transport } from './classes/Transport';
 export * from './helpers/casts';
