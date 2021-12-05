@@ -1,5 +1,9 @@
 # Changelog
 
+### 0.1.1 (Dec 5, 2021)
+
+- Webhooks request data and check signature changes
+
 ### 0.1.0 (Dec 4, 2021)
 
 - Change backend API authorization process

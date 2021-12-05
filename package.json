@@ -1,6 +1,6 @@
 {
   "name": "crypto-bot-api",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Simple and minimalistic client for Telegram CryptoBot Crypto Pay API",
   "keywords": [
     "crypto-bot-api",

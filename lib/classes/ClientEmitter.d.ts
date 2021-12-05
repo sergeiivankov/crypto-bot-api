@@ -9,16 +9,12 @@ import { Middleware } from '../helpers/utils';
  * Check webhook data signature
  *
  * @param apiKey - Api key
- * @param args - Request body `invoice_paid` field
- * @param args.signature - Request body `invoice_paid` field `signature` field
- * @param args.data - Request body `invoice_paid` field other fields
+ * @param signature - Webhook request signature
+ * @param body - Webhook request body
  *
  * @returns Checking result
  */
-export declare const checkSignature: (apiKey: string, { signature, ...data }: {
-    signature: string;
-    data: any[];
-}) => boolean;
+export declare const checkSignature: (apiKey: string, signature: string, body: any) => boolean;
 /**
  * Read and parsing to JSON request body
  *
@@ -103,6 +99,7 @@ declare class ClientEmitter extends Client {
      * Handling webhook data, send response and emit events
      *
      * @param data - Parsed request body
+     * @param req - Node.js built-in IncomingMessage object
      * @param res - Node.js built-in ServerResponse object
      */
     private _handleWebhook;
