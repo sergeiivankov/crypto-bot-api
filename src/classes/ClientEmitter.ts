@@ -11,20 +11,21 @@ import { Middleware } from '../helpers/utils';
  * Check webhook data signature
  *
  * @param apiKey - Api key
- * @param args - Request body `invoice_paid` field
- * @param args.signature - Request body `invoice_paid` field `signature` field
- * @param args.data - Request body `invoice_paid` field other fields
+ * @param signature - Webhook request signature
+ * @param body - Webhook request body
  *
  * @returns Checking result
  */
 /* eslint-enable tsdoc/syntax */
-export const checkSignature = (
-  apiKey: string, { signature, ...data }: { signature: string, data: any[] },
-): boolean => {
-  const secret = createHash('sha256').update(apiKey).digest();
-  const checkString = Object.keys(data).sort().map((k) => `${k}=${data[k]}`).join('\n');
-
-  return signature === createHmac('sha256', secret).update(checkString).digest('hex');
+export const checkSignature = (apiKey: string, signature: string, body: any): boolean => {
+  try {
+    const secret = createHash('sha256').update(apiKey).digest();
+    const checkString = JSON.stringify(body);
+    const hmac = createHmac('sha256', secret).update(checkString).digest('hex');
+    return hmac === signature;
+  } catch (err) {
+    return false;
+  }
 };
 
 /**
@@ -109,7 +110,7 @@ class ClientEmitter extends Client {
           return;
         }
 
-        readRequestBody(req).then((data: any): void => this._handleWebhook(data, res));
+        readRequestBody(req).then((data: any): void => this._handleWebhook(data, req, res));
       };
 
       let server: Server;
@@ -160,7 +161,7 @@ class ClientEmitter extends Client {
     return (req: any, res: any): void => {
       Promise.resolve()
         .then((): any => req.body || readRequestBody(req))
-        .then((data: any): void => this._handleWebhook(data, res));
+        .then((data: any): void => this._handleWebhook(data, req, res));
     };
   }
 
@@ -236,24 +237,31 @@ class ClientEmitter extends Client {
    * Handling webhook data, send response and emit events
    *
    * @param data - Parsed request body
+   * @param req - Node.js built-in IncomingMessage object
    * @param res - Node.js built-in ServerResponse object
    */
-  private _handleWebhook(data: any, res: ServerResponse): void {
+  private _handleWebhook(data: any, req: IncomingMessage, res: ServerResponse): void {
     if (!data) {
       res.statusCode = 500;
       res.end();
       return;
     }
 
-    if (!checkSignature(this._apiKey, data.invoice_paid)) {
+    const header = req.headers['crypto-pay-api-signature'];
+    const signature = Array.isArray(header) ? header[0] : header;
+
+    if (!checkSignature(this._apiKey, signature, data)) {
       res.statusCode = 401;
       res.end();
       return;
     }
 
-    this._emit(
-      'paid', toInvoice(data.invoice_paid), new Date(data.invoice_paid.request_date * 1000),
-    );
+    if (data.update_type === 'invoice_paid') {
+      this._emit(
+        'paid', toInvoice(data.payload), new Date(data.request_date),
+      );
+    }
+
     res.end();
   }
 }
