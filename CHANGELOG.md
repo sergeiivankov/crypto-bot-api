@@ -1,5 +1,9 @@
 # Changelog
 
+### 0.2.0 (Dec 9, 2021)
+
+- Using mainnet endpoint for default
+
 ### 0.1.1 (Dec 5, 2021)
 
 - Webhooks request data and check signature changes

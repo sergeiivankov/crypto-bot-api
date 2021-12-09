@@ -87,8 +87,8 @@ class ClientEmitter extends Client {
   /**
    * Create handling webhooks server
    *
-   * Important: at the time of publication of version 0.1.1 (Dec 5, 2021),
-   * test API servers do not accept self-signed certificates
+   * Important: at the time of publication of version 0.2.0 (Dec 9, 2021),
+   * API servers do not accept self-signed certificates
    *
    * @param serverOptions - Node.js built-in server options
    * @param secretPath - Webhooks secret path, processing webhooks takes place only on it

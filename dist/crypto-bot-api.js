@@ -424,10 +424,8 @@ var CryptoBotAPI = (function () {
                 throw new Error('API key looks like invalid');
             }
             var url;
-            // Mainnet disabled during api testing stage
-            if (endpoint === 'mainnet' || endpoint === 'https://pay.crypt.bot/api') {
-                throw new Error('Mainnet disabled during api testing stage,'
-                    + "pass 'testnet' or endpoint url in second parameter");
+            if (endpoint === 'mainnet') {
+                url = 'https://pay.crypt.bot/api';
             }
             else if (endpoint === 'testnet') {
                 url = 'https://testnet-pay.crypt.bot/api';

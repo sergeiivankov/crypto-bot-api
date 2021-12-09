@@ -18,7 +18,7 @@ export default class Transport {
      *
      * @throws Error - If passed invalid API key or endpoint
      */
-    constructor(apiKey: string, endpoint: string);
+    constructor(apiKey: string, endpoint: 'mainnet' | 'testnet' | string);
     /**
      * Make request to backend API, handle errors and return result
      *

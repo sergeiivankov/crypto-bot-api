@@ -32,7 +32,7 @@ In Node.js:
 ```javascript
 const CryptoBotAPI = require('crypto-bot-api');
 
-const client = new CryptoBotAPI('1234:AAA...AAA', 'testnet');
+const client = new CryptoBotAPI('1234:AAA...AAA');
 
 const me = await client.getMe();
 console.log(me);
@@ -43,7 +43,7 @@ In browsers:
 ```html
 <script src="crypto-bot-api.min.js"></script>
 <script>
-  var client = new CryptoBotAPI('1234:AAA...AAA', 'testnet');
+  var client = new CryptoBotAPI('1234:AAA...AAA');
 
   client.getMe().then(function(me) {
     console.log(me);
@@ -51,7 +51,7 @@ In browsers:
 </script>
 ```
 
-**Important: at the time of publication of version 0.1.1 (Dec 5, 2021), test API servers do not return header Access-Control-Allow-Origin, which allows make requests to API from third-party domains, so client request from website environment won't work (but its work in browser extensions, Electron and similar apps)**
+**Important: at the time of publication of version 0.2.0 (Dec 9, 2021), API servers do not return header Access-Control-Allow-Origin, which allows make requests to API from third-party domains, so client request from website environment won't work (but its work in browser extensions, Electron and similar apps)**
 
 More usage examples see in [examples](https://github.com/sergeiivankov/crypto-bot-api/tree/main/examples) project directory.
 
@@ -61,7 +61,7 @@ Crypto Pay API support events by sending webhooks requests. To handle webhooks r
 
 *Note: you need enable webhooks in CryptoBot app settings.*
 
-**Important: at the time of publication of version 0.1.1 (Dec 5, 2021), test API servers do not accept self-signed certificates**
+**Important: at the time of publication of version 0.2.0 (Dec 9, 2021), API servers do not accept self-signed certificates**
 
 ## Documentation
 

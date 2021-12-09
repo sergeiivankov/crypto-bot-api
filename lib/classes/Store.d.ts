@@ -61,7 +61,7 @@ export default class Store {
      *
      * @throws Error - If passed invalid API key or endpoint
      */
-    constructor(apiKey: string, endpoint?: string);
+    constructor(apiKey: string, endpoint?: 'mainnet' | 'testnet' | string);
     /**
      * Get API supported currencies infomation
      *
