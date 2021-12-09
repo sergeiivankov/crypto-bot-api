@@ -1,5 +1,5 @@
 const CrypoBotAPI = require('../');
 
-const client = new CrypoBotAPI('1234:AAA...AAA', 'testnet');
+const client = new CrypoBotAPI('1234:AAA...AAA');
 
 client.getMe().then(me => console.log(me));

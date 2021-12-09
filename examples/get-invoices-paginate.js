@@ -1,6 +1,6 @@
 const CrypoBotAPI = require('../');
 
-const client = new CrypoBotAPI('1234:AAA...AAA', 'testnet');
+const client = new CrypoBotAPI('1234:AAA...AAA');
 client.setPageSize(20);
 
 client.getInvoicesPaginate({ currency: 'BTC', page: 2 })
