@@ -109,7 +109,7 @@ export default class Store {
    *
    * @throws Error - If passed invalid API key or endpoint
    */
-  constructor(apiKey: string, endpoint: string = 'mainnet') {
+  constructor(apiKey: string, endpoint: 'mainnet' | 'testnet' | string = 'mainnet') {
     this._transport = new Transport(apiKey, endpoint);
   }
 

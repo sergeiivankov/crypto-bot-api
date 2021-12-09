@@ -23,19 +23,15 @@ export default class Transport {
    *
    * @throws Error - If passed invalid API key or endpoint
    */
-  constructor(apiKey: string, endpoint: string) {
+  constructor(apiKey: string, endpoint: 'mainnet' | 'testnet' | string) {
     if (!Transport.KEY_CHECK_REGEXP.test(apiKey)) {
       throw new Error('API key looks like invalid');
     }
 
     let url: string;
 
-    // Mainnet disabled during api testing stage
-    if (endpoint === 'mainnet' || endpoint === 'https://pay.crypt.bot/api') {
-      throw new Error(
-        'Mainnet disabled during api testing stage,'
-        + "pass 'testnet' or endpoint url in second parameter",
-      );
+    if (endpoint === 'mainnet') {
+      url = 'https://pay.crypt.bot/api';
     } else if (endpoint === 'testnet') {
       url = 'https://testnet-pay.crypt.bot/api';
     } else if (!isValidUrl(endpoint)) {
