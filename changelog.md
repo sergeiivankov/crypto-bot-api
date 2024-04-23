@@ -1,14 +1,14 @@
 # Changelog
 
-### 0.2.0 (Dec 9, 2021)
+## 0.2.0 - 2021-12-09
 
 - Using mainnet endpoint for default
 
-### 0.1.1 (Dec 5, 2021)
+## 0.1.1 - 2021-12-05
 
 - Webhooks request data and check signature changes
 
-### 0.1.0 (Dec 4, 2021)
+## 0.1.0 - 2021-12-04
 
 - Change backend API authorization process
 - Remove methods, structures and fields related with deleted from backend API methods
@@ -17,10 +17,10 @@
 - Add support any type in createInvoice payload and correct parsing in getInvoices response by JSON
 - Add direct backend API call method
 
-### 0.0.2 (Nov 30, 2021)
+## 0.0.2 - 2021-11-30
 
 - Increase package version to publish on prereserved npm package name
 
-### 0.0.1 (Nov 29, 2021)
+## 0.0.1 - 2021-11-29
 
 - Initial release
