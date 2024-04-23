@@ -1,24 +1,14 @@
 {
   "name": "crypto-bot-api",
   "version": "0.2.0",
-  "description": "Simple and minimalistic client for Telegram CryptoBot Crypto Pay API",
-  "keywords": [
-    "crypto-bot-api",
-    "crypto-bot",
-    "crypto-pay-api",
-    "crypto-pay",
-    "api-client",
-    "crypto",
-    "cryptocurrency",
-    "exchage",
-    "payment-processing",
-    "cryptocurrency-processing",
-    "ton",
-    "the-open-network",
-    "telegram-bot"
-  ],
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sergeiivankov/crypto-bot-api"
+  },
+  "files": ["lib/**/*"],
   "scripts": {
     "build": "npm run build-docs && npm run build-lib && npm run build-dist",
     "build-docs": "typedoc src/exports.ts",
@@ -29,15 +19,6 @@
     "watch-lib": "tsc-watch --noClear",
     "watch-dist": "rollup -c -w",
     "lint": "eslint src/**/*"
-  },
-  "files": [
-    "lib/**/*"
-  ],
-  "author": "Sergei Ivankov",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/sergeiivankov/crypto-bot-api"
   },
   "devDependencies": {
     "@rollup/plugin-replace": "^3.0.0",
@@ -56,5 +37,22 @@
     "tsc-watch": "^4.5.0",
     "typedoc": "^0.22.10",
     "typescript": "^4.5.2"
-  }
+  },
+  "author": "Sergei Ivankov <sergeiivankov@pm.me>",
+  "description": "Simple and minimalistic client for Telegram CryptoBot Crypto Pay API",
+  "keywords": [
+    "crypto-bot-api",
+    "crypto-bot",
+    "crypto-pay-api",
+    "crypto-pay",
+    "api-client",
+    "crypto",
+    "cryptocurrency",
+    "exchage",
+    "payment-processing",
+    "cryptocurrency-processing",
+    "ton",
+    "the-open-network",
+    "telegram-bot"
+  ]
 }
