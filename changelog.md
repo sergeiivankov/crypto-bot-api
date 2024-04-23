@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.1 - 2024-04-23
+
+- Fix `getInvoices` identifiers parameter name
+
+Thanks:
+
+- [Deyvan](https://github.com/Deyvan)
+
 ## 0.2.0 - 2021-12-09
 
 - Using mainnet endpoint for default

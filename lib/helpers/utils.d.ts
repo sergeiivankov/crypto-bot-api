@@ -71,7 +71,7 @@ export declare type GetInvoicesBackendOptions = {
     /** Invoices currency filter */
     asset?: InvoiceCurrency;
     /** Invoices identifiers filter */
-    invoices_ids?: number[];
+    invoice_ids?: number[];
     /** Invoices status filter */
     status?: InvoiceStatus;
     /** Number of invoices to skip */

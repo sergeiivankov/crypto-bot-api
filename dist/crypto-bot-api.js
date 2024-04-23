@@ -180,7 +180,7 @@ var CryptoBotAPI = (function () {
         if (options.currency !== undefined)
             prepared.asset = options.currency;
         if (options.ids !== undefined) {
-            prepared.invoices_ids = options.ids.map(function (value) { return +value; });
+            prepared.invoice_ids = options.ids.map(function (value) { return +value; });
         }
         return prepared;
     };
@@ -202,7 +202,7 @@ var CryptoBotAPI = (function () {
         if (options.currency !== undefined)
             prepared.asset = options.currency;
         if (options.ids !== undefined) {
-            prepared.invoices_ids = options.ids.map(function (value) { return +value; });
+            prepared.invoice_ids = options.ids.map(function (value) { return +value; });
         }
         // Paginate options
         var page = options.page ? +options.page : 1;
