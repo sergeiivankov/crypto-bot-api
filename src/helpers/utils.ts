@@ -78,7 +78,7 @@ export type GetInvoicesBackendOptions = {
   /** Invoices currency filter */
   asset?: InvoiceCurrency,
   /** Invoices identifiers filter */
-  invoices_ids?: number[],
+  invoice_ids?: number[],
   /** Invoices status filter */
   status?: InvoiceStatus,
   /** Number of invoices to skip */
@@ -271,7 +271,7 @@ export const prepareGetInvoicesOptions = (
   // Different names
   if (options.currency !== undefined) prepared.asset = options.currency;
   if (options.ids !== undefined) {
-    prepared.invoices_ids = options.ids.map((value: number | string): number => +value);
+    prepared.invoice_ids = options.ids.map((value: number | string): number => +value);
   }
 
   return prepared;
@@ -297,7 +297,7 @@ export const prepareGetInvoicesPaginateOptions = (
   // Different names
   if (options.currency !== undefined) prepared.asset = options.currency;
   if (options.ids !== undefined) {
-    prepared.invoices_ids = options.ids.map((value: number | string): number => +value);
+    prepared.invoice_ids = options.ids.map((value: number | string): number => +value);
   }
 
   // Paginate options
