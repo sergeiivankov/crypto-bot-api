@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased changes
+
+- Fix library connection in examples
+- Fix links in `readme.md`
+
 ## 0.2.1 - 2024-04-23
 
 - Fix `getInvoices` identifiers parameter name

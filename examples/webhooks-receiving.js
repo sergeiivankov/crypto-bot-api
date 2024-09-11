@@ -1,5 +1,5 @@
 const { readFileSync } = require('fs');
-const CrypoBotAPI = require('../lib');
+const CrypoBotAPI = require('crypto-bot-api');
 
 const client = new CrypoBotAPI('1234:AAA...AAA');
 
