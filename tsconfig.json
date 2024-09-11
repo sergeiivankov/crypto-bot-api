@@ -20,8 +20,6 @@
       "required-first",
       "alphabetical"
     ],
-    "defaultCategory": "Internal",
-    "plugin": ["nlfurniss-typedoc-plugin-sourcefile-url"],
-    "sourcefile-url-prefix": "https://github.com/sergeiivankov/crypto-bot-api/tree/main/src/"
+    "defaultCategory": "Internal"
   }
 }

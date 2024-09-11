@@ -14,7 +14,7 @@
   "files": ["lib/**/*"],
   "scripts": {
     "build": "npm run build-docs && npm run build-lib && npm run build-dist",
-    "build-docs": "typedoc src/exports.ts",
+    "build-docs": "typedoc",
     "build-lib": "tsc",
     "build-dist": "rollup -c",
     "watch": "run-p watch-docs watch-lib watch-dist",
@@ -34,7 +34,6 @@
     "eslint-config-airbnb": "^19.0.1",
     "eslint-config-airbnb-typescript": "^16.0.0",
     "eslint-plugin-tsdoc": "^0.2.14",
-    "nlfurniss-typedoc-plugin-sourcefile-url": "^2.0.0",
     "npm-run-all": "^4.1.5",
     "rollup": "^4.21.2",
     "tsc-watch": "^4.5.0",
