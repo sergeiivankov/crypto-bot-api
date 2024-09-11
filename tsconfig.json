@@ -20,6 +20,8 @@
       "required-first",
       "alphabetical"
     ],
-    "defaultCategory": "Internal"
+    "defaultCategory": "Internal",
+    "excludeExternals": true,
+    "excludePrivate": false
   }
 }
