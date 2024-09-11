@@ -1,5 +1,5 @@
 import replace from '@rollup/plugin-replace';
-import { terser } from "rollup-plugin-terser";
+import terser from '@rollup/plugin-terser';
 import typescript from '@rollup/plugin-typescript';
 
 const plugins = [
@@ -10,9 +10,12 @@ const plugins = [
     preventAssignment: false
   }),
   typescript({
-    module: 'esnext',
-    target: 'es5',
-    sourceMap: true
+    compilerOptions: {
+      module: 'esnext',
+      target: 'es5',
+      sourceMap: true,
+      declaration: false
+    }
   })
 ];
 
@@ -45,12 +48,7 @@ export default [
     },
     plugins: [
       ...plugins,
-      terser({
-        compress: {
-
-        },
-        format: { comments: false }
-      })
+      terser({ format: { comments: false } })
     ],
     onwarn,
     watch: false

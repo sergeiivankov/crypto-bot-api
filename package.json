@@ -8,6 +8,7 @@
     "type": "git",
     "url": "https://github.com/sergeiivankov/crypto-bot-api"
   },
+  "type": "module",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "files": ["lib/**/*"],
@@ -23,9 +24,10 @@
     "lint": "eslint src/**/*"
   },
   "devDependencies": {
-    "@rollup/plugin-replace": "^3.0.0",
-    "@rollup/plugin-typescript": "^8.3.0",
-    "@types/node": "^16.11.10",
+    "@rollup/plugin-replace": "^5.0.7",
+    "@rollup/plugin-terser": "^0.4.4",
+    "@rollup/plugin-typescript": "^11.1.6",
+    "@types/node": "^22.5.4",
     "@typescript-eslint/eslint-plugin": "^5.4.0",
     "@typescript-eslint/parser": "^5.4.0",
     "eslint": "^8.3.0",
@@ -34,11 +36,11 @@
     "eslint-plugin-tsdoc": "^0.2.14",
     "nlfurniss-typedoc-plugin-sourcefile-url": "^2.0.0",
     "npm-run-all": "^4.1.5",
-    "rollup": "^2.60.1",
-    "rollup-plugin-terser": "^7.0.2",
+    "rollup": "^4.21.2",
     "tsc-watch": "^4.5.0",
-    "typedoc": "^0.22.10",
-    "typescript": "^4.5.2"
+    "tslib": "^2.7.0",
+    "typedoc": "^0.26.7",
+    "typescript": "^5.6.2"
   },
   "keywords": [
     "crypto-bot-api",
