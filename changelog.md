@@ -4,6 +4,7 @@
 
 - Fix library connection in examples
 - Fix links in `readme.md`
+- Fix `Client` class `setPageSize` method documentation parameter name
 - Update dependencies
 
 ## 0.2.1 - 2024-04-23

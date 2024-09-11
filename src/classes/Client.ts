@@ -32,7 +32,7 @@ export default class Client extends Store {
   /**
    * Set count invoices per page for {@link Client.getInvoicesPaginate} method
    *
-   * @param pageSize - Invoices per page
+   * @param pageSizeParam - Invoices per page
    *
    * @throws Error - If `pageSize` parameter is invalid
    */
