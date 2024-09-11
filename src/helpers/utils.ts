@@ -141,7 +141,6 @@ export const getExchageRate = (
     }
   }
 
-  // eslint-disable-next-line no-restricted-globals
   if (isNaN(rate)) return 0;
 
   const numberOfNanosSigns = currencies[target]?.decimals || 8;

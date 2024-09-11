@@ -11,7 +11,9 @@
   "type": "module",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
-  "files": ["lib/**/*"],
+  "files": [
+    "lib/**/*"
+  ],
   "scripts": {
     "build": "npm run build-docs && npm run build-lib && npm run build-dist",
     "build-docs": "typedoc",
@@ -24,16 +26,14 @@
     "lint": "eslint src/**/*"
   },
   "devDependencies": {
+    "@eslint/js": "^9.10.0",
     "@rollup/plugin-replace": "^5.0.7",
     "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^11.1.6",
+    "@types/eslint__js": "^8.42.3",
     "@types/node": "^22.5.4",
-    "@typescript-eslint/eslint-plugin": "^5.4.0",
-    "@typescript-eslint/parser": "^5.4.0",
-    "eslint": "^8.3.0",
-    "eslint-config-airbnb": "^19.0.1",
-    "eslint-config-airbnb-typescript": "^16.0.0",
-    "eslint-plugin-tsdoc": "^0.2.14",
+    "eslint": "^9.10.0",
+    "eslint-plugin-tsdoc": "^0.3.0",
     "npm-run-all": "^4.1.5",
     "rollup": "^4.21.2",
     "tslib": "^2.7.0",
@@ -54,5 +54,8 @@
     "ton",
     "the-open-network",
     "telegram-bot"
-  ]
+  ],
+  "dependencies": {
+    "typescript-eslint": "^8.5.0"
+  }
 }

@@ -9,7 +9,6 @@ import {
 } from '../helpers/utils';
 import Store from './Store';
 
-/* eslint-disable tsdoc/syntax */
 /**
  * Main class for work with API for browsers
  *
@@ -17,7 +16,6 @@ import Store from './Store';
  *
  * @category External
  */
-/* eslint-enable tsdoc/syntax */
 export default class Client extends Store {
   /** Page size for {@link Client.getInvoicesPaginate} method */
   private _pageSize: number = 100;
@@ -61,7 +59,6 @@ export default class Client extends Store {
    */
   getBalances(isReturnInNanos: boolean = false, isForce: boolean = false): Promise<Balances> {
     return Promise.all([this.getCurrencies(isForce), this._transport.call('getBalance')])
-      // eslint-disable-next-line arrow-body-style
       .then(([currencies, balancesResponse]: [Currencies, any]): Balances => {
         return toBalances(balancesResponse, currencies, isReturnInNanos);
       });
@@ -131,7 +128,6 @@ export default class Client extends Store {
     source: string, target: string, isForce: boolean = false,
   ): Promise<number> {
     return Promise.all([this.getCurrencies(isForce), this.getExchangeRates(isForce)])
-      // eslint-disable-next-line arrow-body-style
       .then(([currencies, exchangeRates]: [Currencies, ExchangeRates]): number => {
         return getExchageRate(source, target, exchangeRates, currencies);
       });
@@ -193,7 +189,6 @@ export default class Client extends Store {
     const prepared = prepareGetInvoicesPaginateOptions(this._pageSize, options);
 
     return this._transport.call('getInvoices', prepared)
-      // eslint-disable-next-line arrow-body-style
       .then((result: any): InvoicesPaginated => {
         return toInvoicesPaginated(options.page, this._pageSize, result);
       });

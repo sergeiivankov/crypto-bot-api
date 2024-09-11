@@ -62,13 +62,11 @@ export const createFetchHandler = <T>(
   };
 };
 
-/* eslint-disable tsdoc/syntax */
 /**
  * Wrapper for API methods that return possible cached data
  *
  * @category External
  */
-/* eslint-enable tsdoc/syntax */
 export default class Store {
   /** Update period for fetching currencies from backend API in seconds */
   private static _CURRENCIES_UPDATE_PERIOD = 3600;

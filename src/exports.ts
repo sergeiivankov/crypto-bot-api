@@ -5,7 +5,6 @@ export { ServerOptions as httpServerOptions } from 'http';
 export { Server, ServerOptions } from 'https';
 export { SecureContextOptions, TlsOptions } from 'tls';
 
-// eslint-disable-next-line import/prefer-default-export
 export { default as Client } from './classes/Client';
 export { default as ClientEmitter, checkSignature, readRequestBody } from './classes/ClientEmitter';
 export { default as Store, createFetchHandler } from './classes/Store';

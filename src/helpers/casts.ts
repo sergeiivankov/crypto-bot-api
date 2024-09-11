@@ -242,7 +242,7 @@ export const toInvoice = (input: any): Invoice => {
 
     try {
       payload = JSON.parse(input.payload);
-    } catch (err) {
+    } catch {
       payload = input.payload;
     }
 

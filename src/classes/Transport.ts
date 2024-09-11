@@ -73,7 +73,7 @@ export default class Transport {
         let response: any;
         try {
           response = JSON.parse(rawResponse);
-        } catch (err) {
+        } catch {
           throw new Error(`Response parse error, raw reponse:\n${rawResponse}`);
         }
 

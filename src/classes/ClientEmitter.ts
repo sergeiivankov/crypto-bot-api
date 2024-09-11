@@ -6,7 +6,6 @@ import Client from './Client';
 import { Invoice, toInvoice } from '../helpers/casts';
 import { Middleware } from '../helpers/utils';
 
-/* eslint-disable tsdoc/syntax */
 /**
  * Check webhook data signature
  *
@@ -16,14 +15,13 @@ import { Middleware } from '../helpers/utils';
  *
  * @returns Checking result
  */
-/* eslint-enable tsdoc/syntax */
 export const checkSignature = (apiKey: string, signature: string, body: any): boolean => {
   try {
     const secret = createHash('sha256').update(apiKey).digest();
     const checkString = JSON.stringify(body);
     const hmac = createHmac('sha256', secret).update(checkString).digest('hex');
     return hmac === signature;
-  } catch (err) {
+  } catch {
     return false;
   }
 };
@@ -48,7 +46,7 @@ export const readRequestBody = (
     let data: any;
     try {
       data = JSON.parse(body);
-    } catch (err) {
+    } catch {
       resolve(null);
       return;
     }
@@ -57,7 +55,6 @@ export const readRequestBody = (
   });
 });
 
-/* eslint-disable tsdoc/syntax */
 /**
  * Main class for work with API for Node.js
  *
@@ -65,7 +62,6 @@ export const readRequestBody = (
  *
  * @category External
  */
-/* eslint-enable tsdoc/syntax */
 class ClientEmitter extends Client {
   /** Api key */
   private _apiKey: string;
@@ -76,9 +72,7 @@ class ClientEmitter extends Client {
   /** Event listeners store */
   private _events: { [key: string]: Array<(...args: any) => any> } = {};
 
-  /* eslint-disable tsdoc/syntax */
   /** @inheritdoc */
-  /* eslint-enable tsdoc/syntax */
   constructor(apiKey: string, endpoint: string = 'mainnet') {
     super(apiKey, endpoint);
     this._apiKey = apiKey;
