@@ -97,8 +97,8 @@ $ npm run watch # To watch all
 
 * [Documentation](https://sergeiivankov.github.io/crypto-bot-api/)
 * [Examples](https://github.com/sergeiivankov/crypto-bot-api/examples)
-* [Changelog](https://github.com/sergeiivankov/crypto-bot-api/blob/main/CHANGELOG.md)
-* [Backend CryptoBot API description](https://telegra.ph/Crypto-Pay-API-11-25)
+* [Changelog](https://github.com/sergeiivankov/crypto-bot-api/blob/main/changelog.md)
+* [Backend CryptoBot API description](https://help.crypt.bot/crypto-pay-api)
 
 ## Code quality
 
@@ -110,4 +110,4 @@ $ npm run lint
 
 ## License
 
-[MIT](LICENSE)
+[MIT](https://github.com/sergeiivankov/crypto-bot-api/blob/main/licanse)
