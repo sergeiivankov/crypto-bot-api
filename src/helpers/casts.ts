@@ -3,7 +3,7 @@ import {
 } from './utils';
 
 /** Result type for {@link Client.getBalances} method */
-export type Balances = { [key: string]: string; };
+export type Balances = { [key: string]: string };
 
 /** Possible currencies types */
 export type CurrencyType = 'blockchain' | 'fiat' | 'stablecoin';
@@ -20,7 +20,7 @@ export type Currency = {
   /** Currency decimals count */
   decimals: number,
   /** Currency type */
-  type: CurrencyType
+  type: CurrencyType,
 };
 
 /** Result type for {@link Store.getCurrencies} method */
@@ -40,7 +40,7 @@ export type ExchangeRate = {
   /** Target currency code */
   target: string,
   /** Source to target exchange rate */
-  rate: number
+  rate: number,
 };
 
 /** Result type for {@link Store.getExchangeRates} method */
@@ -95,7 +95,7 @@ export type Invoice = {
    * Invoice displayed to user paid button url,
    * only if `paidBtnUrl` passed in invoice creation
    */
-  paidBtnUrl?: string
+  paidBtnUrl?: string,
 };
 
 /**
@@ -106,7 +106,7 @@ export type Invoices = {
   /** All items count value */
   count: number,
   /** Fetched by passed filters items slice */
-  items: Invoice[]
+  items: Invoice[],
 };
 
 /**
@@ -118,7 +118,7 @@ export type InvoicesPaginated = {
   /** Pagination pages count */
   pagesCount: number,
   /** Fetched by passed filters items slice */
-  items: Invoice[]
+  items: Invoice[],
 };
 
 /** Result type object for {@link Client.getMe} method */
@@ -128,7 +128,7 @@ export type Me = {
   /** App name */
   name: string,
   /** Using Telegram bot username */
-  bot: string
+  bot: string,
 };
 
 /**
@@ -151,9 +151,11 @@ export const toBalances = (
   // Conver array to HashMap structure
   return input.reduce((accumulator: Balances, value: any): Balances => {
     if (value.currency_code && value.available) {
-      accumulator[value.currency_code] = isReturnInNanos ? value.available : nonosToCoins(
-        value.available, value.currency_code, currencies,
-      );
+      accumulator[value.currency_code] = isReturnInNanos
+        ? value.available
+        : nonosToCoins(
+          value.available, value.currency_code, currencies,
+        );
     }
     return accumulator;
   }, {});

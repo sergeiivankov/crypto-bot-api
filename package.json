@@ -32,6 +32,7 @@
     "@rollup/plugin-replace": "^5.0.7",
     "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^11.1.6",
+    "@stylistic/eslint-plugin": "^2.8.0",
     "@types/eslint__js": "^8.42.3",
     "@types/node": "^22.5.4",
     "eslint": "^9.10.0",

@@ -24,7 +24,7 @@ export type CreateInvoiceOptions = {
   /** Is can user leave a comment for invoice */
   isAllowComments?: boolean,
   /** Is can user pay invoice anonymously */
-  isAllowAnonymous?: boolean
+  isAllowAnonymous?: boolean,
 };
 
 /** Backend options object type for {@link Client.createInvoice} method */
@@ -44,7 +44,7 @@ export type CreateInvoiceBackendOptions = {
   /** Is can user leave a comment for invoice */
   allow_comments?: boolean,
   /** Is can user pay invoice anonymously */
-  allow_anonymous?: boolean
+  allow_anonymous?: boolean,
 };
 
 /** Options object type for {@link Client.getInvoices} method */
@@ -58,7 +58,7 @@ export type GetInvoicesOptions = {
   /** Number of invoices to skip */
   offset?: number,
   /** Number of invoices returned */
-  count?: number
+  count?: number,
 };
 
 /** Options object type for {@link Client.getInvoicesPaginate} method */
@@ -70,7 +70,7 @@ export type GetInvoicesPaginateOptions = {
   /** Invoices status filter */
   status?: InvoiceStatus,
   /** Pagination page number */
-  page?: number
+  page?: number,
 };
 
 /** Backend options object type for {@link Client.getInvoices} method */
@@ -84,7 +84,7 @@ export type GetInvoicesBackendOptions = {
   /** Number of invoices to skip */
   offset?: number,
   /** Number of invoices returned */
-  count?: number
+  count?: number,
 };
 
 /** Possible invoices currencies */

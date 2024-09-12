@@ -4,19 +4,19 @@ import typescript from '@rollup/plugin-typescript';
 
 const plugins = [
   replace({
-    'request/http': 'request/xhr',
-    "import Client from './classes/ClientEmitter'": "import Client from './classes/Client';export default Client;",
     delimiters: ['', ''],
-    preventAssignment: false
+    preventAssignment: false,
+    'request/http': 'request/xhr',
+    'import Client from \'./classes/ClientEmitter\'': 'import Client from \'./classes/Client\';export default Client;',
   }),
   typescript({
     compilerOptions: {
       module: 'esnext',
       target: 'es5',
       sourceMap: true,
-      declaration: false
-    }
-  })
+      declaration: false,
+    },
+  }),
 ];
 
 const onwarn = (message, handler) => {
@@ -32,11 +32,11 @@ export default [
       name: 'CryptoBotAPI',
       file: 'dist/crypto-bot-api.js',
       format: 'iife',
-      sourcemap: true
+      sourcemap: true,
     },
     plugins,
     onwarn,
-    watch: { clearScreen: false }
+    watch: { clearScreen: false },
   },
   {
     input: 'src/index.ts',
@@ -44,13 +44,13 @@ export default [
       name: 'CryptoBotAPI',
       file: 'dist/crypto-bot-api.min.js',
       format: 'iife',
-      sourcemap: true
+      sourcemap: true,
     },
     plugins: [
       ...plugins,
-      terser({ format: { comments: false } })
+      terser({ format: { comments: false } }),
     ],
     onwarn,
-    watch: false
-  }
+    watch: false,
+  },
 ];
