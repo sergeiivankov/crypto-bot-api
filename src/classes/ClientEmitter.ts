@@ -75,7 +75,11 @@ class ClientEmitter extends Client {
   /** Event listeners store */
   private _events: { [key: string]: Array<(...args: any) => any> } = {};
 
-  /** {@inheritdoc} */
+  // Because `tsdoc` throw `tsdoc-reference-selector-missing-parens`,
+  // but `typedoc` doesn't recognize reference in parentheses
+  /* eslint-disable tsdoc/syntax */
+  /** {@inheritDoc Client:constructor} */
+  /* eslint-enable tsdoc/syntax */
   constructor(apiKey: string, endpoint: string = 'mainnet') {
     super(apiKey, endpoint);
     this._apiKey = apiKey;
