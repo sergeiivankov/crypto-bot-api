@@ -2,6 +2,7 @@
 
 ## Unreleased changes
 
+- Add 'unknown' variant for `CurrencyType`
 - Fix library connection in examples
 - Fix links in `readme.md`
 - Fix `Client` class `setPageSize` method documentation parameter name

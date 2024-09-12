@@ -6,7 +6,7 @@ import {
 export type Balances = { [key: string]: string };
 
 /** Possible currencies types */
-export type CurrencyType = 'blockchain' | 'fiat' | 'stablecoin';
+export type CurrencyType = 'blockchain' | 'fiat' | 'stablecoin' | 'unknown';
 
 /**
  * Currency type object for {@link Store.getCurrencies}
@@ -176,7 +176,7 @@ export const toCurrencies = (input: any): Currencies => {
     if (value.code) {
       const code = value.code.toString();
 
-      let type: CurrencyType;
+      let type: CurrencyType = 'unknown';
       if (value.is_blockchain) type = 'blockchain';
       if (value.is_fiat) type = 'fiat';
       if (value.is_stablecoin) type = 'stablecoin';
