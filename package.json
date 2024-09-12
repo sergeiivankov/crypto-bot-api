@@ -8,9 +8,11 @@
     "type": "git",
     "url": "https://github.com/sergeiivankov/crypto-bot-api"
   },
-  "type": "module",
-  "main": "lib/index.js",
-  "types": "lib/index.d.ts",
+  "exports": {
+    "types": "./lib/index.d.ts",
+    "require": "./lib/index.js",
+    "default": "./lib/index.js"
+  },
   "files": [
     "lib/**/*"
   ],
