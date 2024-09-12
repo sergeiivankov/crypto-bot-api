@@ -1,6 +1,6 @@
 import {
-  Balances, toBalances, Currency, Currencies, CurrencyType, ExchangeRates, Invoice, Invoices,
-  InvoicesPaginated, toInvoice, toInvoices, toInvoicesPaginated,
+  Balances, toBalances, Currency, CurrencyCode, Currencies, CurrencyType, ExchangeRates, Invoice,
+  Invoices, InvoicesPaginated, toInvoice, toInvoices, toInvoicesPaginated,
 } from '../helpers/casts';
 import {
   ApiMethod, CreateInvoiceOptions, GetInvoicesOptions, GetInvoicesPaginateOptions,
@@ -88,7 +88,7 @@ export default class Client extends Store {
    * @returns Promise, what resolved to API app balance value for passed currency
    */
   getBalance(
-    currencyCode: string, isReturnInNanos: boolean = false, isForce: boolean = false,
+    currencyCode: CurrencyCode, isReturnInNanos: boolean = false, isForce: boolean = false,
   ): Promise<string> {
     return this.getBalances(isReturnInNanos, isForce)
       .then((balances: Balances): string => {
@@ -110,7 +110,7 @@ export default class Client extends Store {
    * @returns Promise, what resolved to currency with passed code infomation object
    *          or null, if currency with passed code not exists
    */
-  getCurrency(currencyCode: string, isForce: boolean = false): Promise<Currency | null> {
+  getCurrency(currencyCode: CurrencyCode, isForce: boolean = false): Promise<Currency | null> {
     return this.getCurrencies(isForce)
       .then((currencies: Currencies): Currency | null => {
         if (currencies[currencyCode] === undefined) return null;

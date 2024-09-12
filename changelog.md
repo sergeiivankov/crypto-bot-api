@@ -2,11 +2,14 @@
 
 ## Unreleased changes
 
+- Create `CurrencyCode` type with known variants
+- Add `code` field to `Currency` type
 - Add 'unknown' variant for `CurrencyType`
 - Replace `CurrencyType` by enum and store it in `Client` class
 - Fix library connection in examples
 - Fix links in `readme.md`
 - Fix `Client` class `setPageSize` method documentation parameter name
+- Fix `ClientEmitter.constructor` documentation inheritance
 - Update dependencies
 
 ## 0.2.1 - 2024-04-23

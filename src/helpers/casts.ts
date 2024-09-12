@@ -5,6 +5,11 @@ import {
 /** Result type for {@link Client.getBalances} method */
 export type Balances = { [key: string]: string };
 
+export type CurrencyCode =
+  'USDT' | 'TON' | 'BTC' | 'LTC' | 'ETH' | 'BNB' | 'TRX' | 'USDC' | 'JET' | 'RUB' | 'USD' | 'EUR' |
+  'BYN' | 'UAH' | 'GBP' | 'CNY' | 'KZT' | 'UZS' | 'GEL' | 'TRY' | 'AMD' | 'THB' | 'INR' | 'BRL' |
+  'IDR' | 'AZN' | 'AED' | 'PLN' | 'ILS' | 'KGS' | 'TJS';
+
 /** Possible currencies types */
 export enum CurrencyType {
   Blockchain = 'blockchain',
@@ -18,6 +23,8 @@ export enum CurrencyType {
  * and {@link Client.getCurrency} methods results
  */
 export type Currency = {
+  /** Currency code */
+  code: CurrencyCode,
   /** Currency name */
   name: string,
   /** Crypto currency office website url */
@@ -29,7 +36,7 @@ export type Currency = {
 };
 
 /** Result type for {@link Store.getCurrencies} method */
-export type Currencies = { [key: string]: Currency };
+export type Currencies = { [variant in CurrencyCode]?: Currency };
 
 /**
  * Exchange rate type object for {@link Store.getExchangeRates}
@@ -179,7 +186,7 @@ export const toCurrencies = (input: any): Currencies => {
 
   return input.reduce((accumulator: Currencies, value: any): Currencies => {
     if (value.code) {
-      const code = value.code.toString();
+      const code: CurrencyCode = value.code.toString();
 
       let type = CurrencyType.Unknown;
       if (value.is_blockchain) type = CurrencyType.Blockchain;
@@ -187,6 +194,7 @@ export const toCurrencies = (input: any): Currencies => {
       if (value.is_stablecoin) type = CurrencyType.Stablecoin;
 
       const currency: Currency = {
+        code: code,
         name: value.name || '',
         decimals: value.decimals || 0,
         type,
