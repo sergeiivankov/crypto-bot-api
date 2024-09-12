@@ -19,10 +19,10 @@ const plugins = [
   })
 ];
 
-const onwarn = (message) => {
+const onwarn = (message, handler) => {
   if (/TS18028/.test(message)) return;
   if (/TS1203/.test(message)) return;
-  console.error(message);
+  handler(message);
 };
 
 export default [

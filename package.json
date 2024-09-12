@@ -23,7 +23,7 @@
     "watch-docs": "typedoc --watch --preserveWatchOutput",
     "watch-lib": "tsc -w",
     "watch-dist": "rollup -c -w",
-    "lint": "eslint src/**/*"
+    "lint": "eslint"
   },
   "devDependencies": {
     "@eslint/js": "^9.10.0",
@@ -35,7 +35,7 @@
     "eslint": "^9.10.0",
     "eslint-plugin-tsdoc": "^0.3.0",
     "npm-run-all": "^4.1.5",
-    "rollup": "^4.21.2",
+    "rollup": "^4.21.3",
     "tslib": "^2.7.0",
     "typedoc": "^0.26.7",
     "typescript": "^5.6.2"

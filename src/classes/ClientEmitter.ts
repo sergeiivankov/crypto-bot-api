@@ -55,6 +55,8 @@ export const readRequestBody = (
   });
 });
 
+// Because `tsdoc` not support `@category` tag, but `typedoc` support
+/* eslint-disable tsdoc/syntax */
 /**
  * Main class for work with API for Node.js
  *
@@ -62,6 +64,7 @@ export const readRequestBody = (
  *
  * @category External
  */
+/* eslint-enable tsdoc/syntax */
 class ClientEmitter extends Client {
   /** Api key */
   private _apiKey: string;
@@ -72,7 +75,7 @@ class ClientEmitter extends Client {
   /** Event listeners store */
   private _events: { [key: string]: Array<(...args: any) => any> } = {};
 
-  /** @inheritdoc */
+  /** {@inheritdoc} */
   constructor(apiKey: string, endpoint: string = 'mainnet') {
     super(apiKey, endpoint);
     this._apiKey = apiKey;

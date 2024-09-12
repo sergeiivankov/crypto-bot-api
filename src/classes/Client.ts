@@ -9,6 +9,8 @@ import {
 } from '../helpers/utils';
 import Store from './Store';
 
+// Because `tsdoc` not support `@category` tag, but `typedoc` support
+/* eslint-disable tsdoc/syntax */
 /**
  * Main class for work with API for browsers
  *
@@ -16,6 +18,7 @@ import Store from './Store';
  *
  * @category External
  */
+/* eslint-enable tsdoc/syntax */
 export default class Client extends Store {
   /** Page size for {@link Client.getInvoicesPaginate} method */
   private _pageSize: number = 100;

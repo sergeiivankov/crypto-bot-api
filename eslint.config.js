@@ -6,8 +6,19 @@ export default tseslint.config(
   eslint.configs.recommended,
   ...tseslint.configs.recommended,
   {
-    files: ["src/**/*.ts"],
+    files: ["src/**/*"],
     plugins: { tsdoc },
-    rules: { "@typescript-eslint/no-explicit-any": "off" }
+    rules: {
+      "@typescript-eslint/no-explicit-any": "off",
+      "tsdoc/syntax": "warn"
+    }
+  },
+  {
+    ignores: [
+      'dist/',
+      'docs/',
+      'examples/',
+      'lib/'
+    ]
   }
 );
