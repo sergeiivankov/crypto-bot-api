@@ -1,4 +1,4 @@
-import { Currencies, ExchangeRates } from './casts';
+import { Currencies, InvoiceStatus, ExchangeRates } from './casts';
 
 /** Possible backend API methods names */
 export type ApiMethod =
@@ -54,7 +54,7 @@ export type GetInvoicesOptions = {
   /** Invoices identifiers filter */
   ids?: (number | string)[],
   /** Invoices status filter */
-  status?: InvoiceStatus,
+  status?: GetInvoicesStatus,
   /** Number of invoices to skip */
   offset?: number,
   /** Number of invoices returned */
@@ -68,7 +68,7 @@ export type GetInvoicesPaginateOptions = {
   /** Invoices identifiers filter */
   ids?: (number | string)[],
   /** Invoices status filter */
-  status?: InvoiceStatus,
+  status?: GetInvoicesStatus,
   /** Pagination page number */
   page?: number,
 };
@@ -80,7 +80,7 @@ export type GetInvoicesBackendOptions = {
   /** Invoices identifiers filter */
   invoice_ids?: number[],
   /** Invoices status filter */
-  status?: InvoiceStatus,
+  status?: GetInvoicesStatus,
   /** Number of invoices to skip */
   offset?: number,
   /** Number of invoices returned */
@@ -92,10 +92,10 @@ export type InvoiceCurrency = 'BTC' | 'ETH' | 'TON' | 'BNB' | 'BUSD' | 'USDC' | 
 
 /**
  * Possible invoices statuses
- * - active - Unpaid invoice
- * - paid - Paid invoice
+ * - {@link InvoiceStatus.Active} - Unpaid invoice
+ * - {@link InvoiceStatus.Paid} - Paid invoice
  */
-export type InvoiceStatus = 'active' | 'paid';
+export type GetInvoicesStatus = InvoiceStatus.Active | InvoiceStatus.Paid;
 
 /**
  * Express.js-like API middleware handler

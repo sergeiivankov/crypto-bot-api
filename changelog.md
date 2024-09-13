@@ -2,10 +2,14 @@
 
 ## Unreleased changes
 
+- Update `Invoice` type to actual API version
 - Create `CurrencyCode` type with known variants
 - Add `code` field to `Currency` type
 - Add 'unknown' variant for `CurrencyType`
 - Replace `CurrencyType` by enum and store it in `Client` class
+- Rename `CurrencyType` to `DetailedCurrencyType` with more detailed variants
+- Use `CurrencyType` type to main types variants and store it in `Client` class
+- Replace `InvoiceStatus` by enum and store it in `Client` class
 - Fix library connection in examples
 - Fix links in `readme.md`
 - Fix `Client` class `setPageSize` method documentation parameter name

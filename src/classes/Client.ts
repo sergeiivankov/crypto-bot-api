@@ -1,6 +1,7 @@
 import {
-  Balances, toBalances, Currency, CurrencyCode, Currencies, CurrencyType, ExchangeRates, Invoice,
-  Invoices, InvoicesPaginated, toInvoice, toInvoices, toInvoicesPaginated,
+  Balances, toBalances, Currency, CurrencyCode, Currencies, DetailedCurrencyType, ExchangeRates,
+  Invoice, Invoices, InvoicesPaginated, InvoiceStatus, toInvoice, toInvoices, toInvoicesPaginated,
+  CurrencyType,
 } from '../helpers/casts';
 import {
   ApiMethod, CreateInvoiceOptions, GetInvoicesOptions, GetInvoicesPaginateOptions,
@@ -24,10 +25,21 @@ export default class Client extends Store {
   private _pageSize: number = 100;
 
   /**
-   * Access to {@link CurrencyType} enumeration, used in {@link Store.getCurrencies}
-   * and {@link Client.getCurrency} methods results
+   * Access to {@link CurrencyType} enumeration, used in {@link Invoice} type
    */
   public static CurrencyType: typeof CurrencyType = CurrencyType;
+
+  /**
+ * Access to {@link DetailedCurrencyType} enumeration, used in {@link Store.getCurrencies}
+ * and {@link Client.getCurrency} methods results
+ */
+  public static DetailedCurrencyType: typeof DetailedCurrencyType = DetailedCurrencyType;
+
+  /**
+   * Access to {@link InvoiceStatus} enumeration, used in {@link Invoice} type,
+   * {@link Client.getInvoices} and {@link Client.getInvoicesPaginate} methods options
+   */
+  public static InvoiceStatus: typeof InvoiceStatus = InvoiceStatus;
 
   /**
    * Return count invoices per page for {@link Client.getInvoicesPaginate} method
