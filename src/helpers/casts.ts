@@ -1,4 +1,4 @@
-import { InvoiceCurrency, PaidBtnName, nonosToCoins } from './utils';
+import { PaidBtnName, nonosToCoins } from './utils';
 
 /** Result type for {@link Client.getBalances} method */
 export type Balances = { [key: string]: string };
@@ -94,7 +94,7 @@ export type Invoice = {
   /** Invoice currency type */
   currencyType: CurrencyType,
   /** Invoice currency code */
-  currency: InvoiceCurrency,
+  currency: CurrencyCode,
   /** Invoice amount */
   amount: number,
   /** Invoice pay url for user by bot */

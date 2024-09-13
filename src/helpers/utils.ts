@@ -1,4 +1,6 @@
-import { Currencies, InvoiceStatus, ExchangeRates } from './casts';
+import {
+  Currencies, CurrencyType, CryptoCurrencyCode, FiatCurrencyCode, InvoiceStatus, ExchangeRates,
+} from './casts';
 
 /** Possible backend API methods names */
 export type ApiMethod =
@@ -6,10 +8,16 @@ export type ApiMethod =
 
 /** Options object type for {@link Client.createInvoice} method */
 export type CreateInvoiceOptions = {
-  /** Invoice currency */
-  currency: InvoiceCurrency,
   /** Invoice amount */
   amount: number | string,
+  /** Currency type */
+  currencyType?: CurrencyType.Crypto | CurrencyType.Fiat,
+  /** Invoice asset */
+  asset?: CryptoCurrencyCode,
+  /** Invoice fiat */
+  fiat?: FiatCurrencyCode,
+  /** List of cryptocurrency alphabetic codes */
+  acceptedAssets?: CryptoCurrencyCode[],
   /** Invoice description, displayed to user, up to 1024 symbols */
   description?: string,
   /**
@@ -25,14 +33,24 @@ export type CreateInvoiceOptions = {
   isAllowComments?: boolean,
   /** Is can user pay invoice anonymously */
   isAllowAnonymous?: boolean,
+  /** Text of the message which will be presented to a user after the invoice is paid */
+  hiddenMessage?: string,
+  /** You can set a payment time limit for the invoice in seconds */
+  expiresIn?: number,
 };
 
 /** Backend options object type for {@link Client.createInvoice} method */
 export type CreateInvoiceBackendOptions = {
-  /** Invoice currency */
-  asset: InvoiceCurrency,
   /** Invoice amount */
-  amount: number,
+  amount: string,
+  /** Currency type */
+  currency_type?: CurrencyType.Crypto | CurrencyType.Fiat,
+  /** Invoice asset */
+  asset?: CryptoCurrencyCode,
+  /** Invoice fiat */
+  fiat?: FiatCurrencyCode,
+  /** List of cryptocurrency alphabetic codes separated comma */
+  accepted_assets?: string,
   /** Invoice description, displayed to user */
   description?: string,
   /** Invoice payload, visible only for app */
@@ -45,12 +63,16 @@ export type CreateInvoiceBackendOptions = {
   allow_comments?: boolean,
   /** Is can user pay invoice anonymously */
   allow_anonymous?: boolean,
+  /** Text of the message which will be presented to a user after the invoice is paid */
+  hidden_message?: string,
+  /** You can set a payment time limit for the invoice in seconds */
+  expires_in?: number,
 };
 
 /** Options object type for {@link Client.getInvoices} method */
 export type GetInvoicesOptions = {
   /** Invoices currency filter */
-  currency?: InvoiceCurrency,
+  currency?: CryptoCurrencyCode,
   /** Invoices identifiers filter */
   ids?: (number | string)[],
   /** Invoices status filter */
@@ -64,7 +86,7 @@ export type GetInvoicesOptions = {
 /** Options object type for {@link Client.getInvoicesPaginate} method */
 export type GetInvoicesPaginateOptions = {
   /** Invoices currency filter */
-  currency?: InvoiceCurrency,
+  currency?: CryptoCurrencyCode,
   /** Invoices identifiers filter */
   ids?: (number | string)[],
   /** Invoices status filter */
@@ -76,7 +98,7 @@ export type GetInvoicesPaginateOptions = {
 /** Backend options object type for {@link Client.getInvoices} method */
 export type GetInvoicesBackendOptions = {
   /** Invoices currency filter */
-  asset?: InvoiceCurrency,
+  asset?: CryptoCurrencyCode,
   /** Invoices identifiers filter */
   invoice_ids?: number[],
   /** Invoices status filter */
@@ -86,9 +108,6 @@ export type GetInvoicesBackendOptions = {
   /** Number of invoices returned */
   count?: number,
 };
-
-/** Possible invoices currencies */
-export type InvoiceCurrency = 'BTC' | 'ETH' | 'TON' | 'BNB' | 'BUSD' | 'USDC' | 'USDT';
 
 /**
  * Possible invoices statuses
@@ -174,7 +193,7 @@ export const isValidUrl = (input: string): boolean => URL_CHECK_REGEXP.test(inpu
  * @returns Representation of amount in coins
  */
 export const nonosToCoins = (
-  value: string, currencyCode: InvoiceCurrency, currencies: Currencies,
+  value: string, currencyCode: CryptoCurrencyCode, currencies: Currencies,
 ): string => {
   let result = value;
 
@@ -212,11 +231,22 @@ export const prepareCreateInvoiceOptions = (
   options: CreateInvoiceOptions,
 ): CreateInvoiceBackendOptions => {
   // Check is options object valid
-  if (options.description && options.description.length > 1024) {
+  if (options.description !== undefined && options.description.length > 1024) {
     throw new Error('Description can\'t be longer than 1024 characters');
   }
-  if (options.paidBtnName && !options.paidBtnUrl) {
+  if (options.paidBtnName !== undefined && !options.paidBtnUrl) {
     throw new Error('Require paidBtnUrl parameter if paidBtnName parameter pass');
+  }
+  if (options.hiddenMessage !== undefined && options.hiddenMessage.length > 2048) {
+    throw new Error('Hidden message can\'t be longer than 2048 characters');
+  }
+  if (
+    options.expiresIn !== undefined
+    && (typeof options.expiresIn !== 'number'
+      || options.expiresIn < 1
+      || options.expiresIn > 2678400)
+  ) {
+    throw new Error('Expires must be a number between 1-2678400');
   }
 
   let payload: string;
@@ -231,12 +261,34 @@ export const prepareCreateInvoiceOptions = (
 
   // Create object with required parameters
   const prepared: CreateInvoiceBackendOptions = {
-    asset: options.currency,
-    amount: +options.amount,
+    amount: typeof options.amount === 'number' ? '' + options.amount : options.amount,
   };
 
+  const currencyType = options.currencyType || CurrencyType.Crypto;
+  prepared.currency_type = currencyType;
+
+  if (currencyType === CurrencyType.Crypto) {
+    const asset = options.asset;
+    if (!asset) throw new Error('Field `asset` required for crypto currency type');
+    prepared.asset = asset;
+  }
+  if (currencyType === CurrencyType.Fiat) {
+    const fiat = options.fiat;
+    if (!fiat) throw new Error('Field `fiat` required for fiat currency type');
+    prepared.fiat = fiat;
+
+    if (options.acceptedAssets !== undefined) {
+      if (!Array.isArray(options.acceptedAssets)) {
+        throw new Error('Field `acceptedAssets` must be array');
+      }
+      prepared.accepted_assets = options.acceptedAssets.join(',');
+    }
+  }
+
   // Same names
+  if (options.expiresIn !== undefined) prepared.expires_in = options.expiresIn;
   if (options.description !== undefined) prepared.description = options.description;
+  if (options.hiddenMessage !== undefined) prepared.hidden_message = options.hiddenMessage;
   if (payload !== undefined) prepared.payload = payload;
 
   // Different names
