@@ -4,7 +4,8 @@ import {
 
 /** Possible backend API methods names */
 export type ApiMethod =
-  'getMe' | 'createInvoice' | 'getInvoices' | 'getBalance' | 'getExchangeRates' | 'getCurrencies';
+  'getMe' | 'createInvoice' | 'deleteInvoice' | 'deleteCheck' | 'getInvoices' | 'getBalance' |
+  'getExchangeRates' | 'getCurrencies';
 
 /** Options object type for {@link Client.createInvoice} method */
 export type CreateInvoiceOptions = {
@@ -298,6 +299,23 @@ export const prepareCreateInvoiceOptions = (
   if (options.isAllowAnonymous !== undefined) prepared.allow_anonymous = options.isAllowAnonymous;
 
   return prepared;
+};
+
+/**
+ * Convert identifier to using backend API delete methods
+ *
+ * @param id - Passed identifier
+ *
+ * @throws Error - If options identifier invalid
+ *
+ * @returns Identifier number
+ */
+export const prepareDeleteOptions = (id: any): number => {
+  if (typeof id !== 'number' || isNaN(id) || id < 1) {
+    throw new Error('Identifier must be a valid positive number');
+  }
+
+  return id;
 };
 
 /**

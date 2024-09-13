@@ -5,7 +5,7 @@ import {
 } from '../helpers/casts';
 import {
   ApiMethod, CreateInvoiceOptions, GetInvoicesOptions, GetInvoicesPaginateOptions,
-  getExchageRate, prepareCreateInvoiceOptions, prepareGetInvoicesOptions,
+  getExchageRate, prepareCreateInvoiceOptions, prepareDeleteOptions, prepareGetInvoicesOptions,
   prepareGetInvoicesPaginateOptions,
 } from '../helpers/utils';
 import Store from './Store';
@@ -170,6 +170,32 @@ export default class Client extends Store {
   createInvoice(options: CreateInvoiceOptions): Promise<Invoice> {
     return this._transport.call('createInvoice', prepareCreateInvoiceOptions(options))
       .then((result: any): Invoice => toInvoice(result));
+  }
+
+  /**
+   * Delete invoice
+   *
+   * @param id - Invoice identifier
+   *
+   * @throws Error - If there is an error sending request to backend API or parsing response error
+   *
+   * @returns Promise, what resolved to boolean operation result status
+   */
+  deleteInvoice(id: number): Promise<boolean> {
+    return this._transport.call('deleteInvoice', { invoice_id: prepareDeleteOptions(id) });
+  }
+
+  /**
+   * Delete check
+   *
+   * @param id - Check identifier
+   *
+   * @throws Error - If there is an error sending request to backend API or parsing response error
+   *
+   * @returns Promise, what resolved to boolean operation result status
+   */
+  deleteCheck(id: number): Promise<boolean> {
+    return this._transport.call('deleteCheck', { check_id: prepareDeleteOptions(id) });
   }
 
   /**

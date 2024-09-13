@@ -4,6 +4,7 @@
 
 - Update `Invoice` type to actual API version
 - Update `createInvoice` method to actual API version, change related options types
+- Add `deleteInvoice` and `deleteCheck` methods
 - Create `CurrencyCode` type with known variants
 - Add `code` field to `Currency` type
 - Add 'unknown' variant for `CurrencyType`
