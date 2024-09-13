@@ -39,7 +39,6 @@ export default tseslint.config(
   {
     ignores: [
       'dist/',
-      'docs/',
       'examples/',
       'lib/',
     ],
