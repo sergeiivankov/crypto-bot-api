@@ -1,7 +1,7 @@
 import {
-  Balances, toBalances, Currency, CurrencyCode, Currencies, DetailedCurrencyType, ExchangeRates,
-  Invoice, Invoices, InvoicesPaginated, InvoiceStatus, toInvoice, toInvoices, toInvoicesPaginated,
-  CurrencyType,
+  Balances, Balance, BalancesType, Currency, CurrencyCode, CryptoCurrencyCode, CurrencyType,
+  Currencies, DetailedCurrencyType, ExchangeRates, Invoice, Invoices, InvoicesPaginated,
+  InvoiceStatus, toBalances, toInvoice, toInvoices, toInvoicesPaginated,
 } from '../helpers/casts';
 import {
   ApiMethod, CreateInvoiceOptions, GetInvoicesOptions, GetInvoicesPaginateOptions,
@@ -68,20 +68,57 @@ export default class Client extends Store {
    *
    * Use {@link toBalances} backend API result convert function
    *
-   * Call {@link Store.getCurrencies} method to fetch exchange rates information
-   *
-   * @param isReturnInNanos - If true, return raw balances in nanos,
-   *                          else return converted to coins balances
-   * @param isForce - If true, return fresh data from backend API, not from cache
-   *
    * @throws Error - If there is an error sending request to backend API or parsing response
    *
    * @returns Promise, what resolved to API app balances infomation object
    */
-  getBalances(isReturnInNanos: boolean = false, isForce: boolean = false): Promise<Balances> {
-    return Promise.all([this.getCurrencies(isForce), this._transport.call('getBalance')])
-      .then(([currencies, balancesResponse]: [Currencies, any]): Balances => {
-        return toBalances(balancesResponse, currencies, isReturnInNanos);
+  getBalances(): Promise<Balances> {
+    return this._transport.call('getBalance').then((result: any): Balances => toBalances(result));
+  }
+
+  /**
+   * Get API app balances infomation
+   *
+   * Use {@link toBalances} backend API result convert function
+   *
+   * @throws Error - If there is an error sending request to backend API or parsing response
+   *
+   * @returns Promise, what resolved to API app available balances infomation object
+   */
+  getBalancesAvailable(): Promise<BalancesType> {
+    return this.getBalances()
+      .then((balances: Balances): BalancesType => {
+        return Object.entries(balances).reduce(
+          (accumulator: BalancesType, entry: [CryptoCurrencyCode, Balance]): BalancesType => {
+            const [code, balance] = entry;
+            accumulator[code] = balance.available;
+            return accumulator;
+          },
+          {} as BalancesType,
+        );
+      });
+  }
+
+  /**
+   * Get API app balances infomation
+   *
+   * Use {@link toBalances} backend API result convert function
+   *
+   * @throws Error - If there is an error sending request to backend API or parsing response
+   *
+   * @returns Promise, what resolved to API app balances on hold infomation object
+   */
+  getBalancesOnhold(): Promise<BalancesType> {
+    return this.getBalances()
+      .then((balances: Balances): BalancesType => {
+        return Object.entries(balances).reduce(
+          (accumulator: BalancesType, entry: [CryptoCurrencyCode, Balance]): BalancesType => {
+            const [code, balance] = entry;
+            accumulator[code] = balance.onhold;
+            return accumulator;
+          },
+          {} as BalancesType,
+        );
       });
   }
 
@@ -90,22 +127,55 @@ export default class Client extends Store {
    *
    * Call {@link Client.getBalances} method to fetch balances information
    *
-   * @param currencyCode - Currency code
-   * @param isReturnInNanos - If true, return raw balances in nanos,
-   *                          else return converted to coins balances
-   * @param isForce - If true, return fresh data from backend API, not from cache
+   * @param currencyCode - Crypto currency code
    *
    * @throws Error - If there is an error sending request to backend API or parsing response
    *
    * @returns Promise, what resolved to API app balance value for passed currency
    */
-  getBalance(
-    currencyCode: CurrencyCode, isReturnInNanos: boolean = false, isForce: boolean = false,
-  ): Promise<string> {
-    return this.getBalances(isReturnInNanos, isForce)
+  getBalance(currencyCode: CryptoCurrencyCode): Promise<Balance> {
+    return this.getBalances()
+      .then((balances: Balances): Balance => {
+        if (balances[currencyCode] === undefined) return { available: '0', onhold: '0' };
+        return balances[currencyCode];
+      });
+  }
+
+  /**
+   * Get API app balance value for passed currency
+   *
+   * Call {@link Client.getBalances} method to fetch balances information
+   *
+   * @param currencyCode - Crypto currency code
+   *
+   * @throws Error - If there is an error sending request to backend API or parsing response
+   *
+   * @returns Promise, what resolved to API app available balance value for passed currency
+   */
+  getBalanceAvailable(currencyCode: CryptoCurrencyCode): Promise<string> {
+    return this.getBalances()
       .then((balances: Balances): string => {
         if (balances[currencyCode] === undefined) return '0';
-        return balances[currencyCode];
+        return balances[currencyCode].available;
+      });
+  }
+
+  /**
+   * Get API app balance value for passed currency
+   *
+   * Call {@link Client.getBalances} method to fetch balances information
+   *
+   * @param currencyCode - Crypto currency code
+   *
+   * @throws Error - If there is an error sending request to backend API or parsing response
+   *
+   * @returns Promise, what resolved to API app balance on hold value for passed currency
+   */
+  getBalanceOnhold(currencyCode: CryptoCurrencyCode): Promise<string> {
+    return this.getBalances()
+      .then((balances: Balances): string => {
+        if (balances[currencyCode] === undefined) return '0';
+        return balances[currencyCode].onhold;
       });
   }
 

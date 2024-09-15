@@ -182,43 +182,6 @@ const URL_CHECK_REGEXP = /^https?:\/\/((([a-z\d][a-z\d-]*[a-z\d])\.)+[a-z]{2,}|(
 export const isValidUrl = (input: string): boolean => URL_CHECK_REGEXP.test(input);
 
 /**
- * Convert nanos string value to the form of string of whole coins
- *
- * @remarks
- * Currencies need to know how many characters after decimal point are used by currency
- *
- * @param value - Value in nanos
- * @param currencyCode - Currency code
- * @param currencies - Currencies information from {@link Store.getCurrencies} method
- *
- * @returns Representation of amount in coins
- */
-export const nonosToCoins = (
-  value: string, currencyCode: CryptoCurrencyCode, currencies: Currencies,
-): string => {
-  let result = value;
-
-  // Use default value as `8` if decimals property is lost
-  const numberOfNanosSigns = currencies[currencyCode]?.decimals || 8;
-  const zerosNeed = numberOfNanosSigns - result.length;
-
-  if (zerosNeed > 0) {
-    let zeros = '';
-    for (let i = 0; i < zerosNeed; i += 1) zeros += '0';
-    result = zeros + result;
-  }
-
-  if (result.length === numberOfNanosSigns) result = `0.${result}`;
-  else {
-    const pointPosition = result.length - numberOfNanosSigns;
-    result = `${result.substr(0, pointPosition)}.${result.substr(pointPosition)}`;
-  }
-
-  // Remove trailing zeros
-  return result.replace(/0+$/, '');
-};
-
-/**
  * Convert {@link CreateInvoiceOptions} object to using backend API method
  * parameters {@link CreateInvoiceBackendOptions} object
  *

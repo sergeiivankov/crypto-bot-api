@@ -5,9 +5,13 @@
 - Update `Invoice` type to actual API version
 - Update `createInvoice` method to actual API version, change related options types
 - Add `deleteInvoice` and `deleteCheck` methods
+- Change `Balances` type to store available and on hold balances in new `Balance` type
+- Create `BalancesType` type to store available or on hold balances
+- Remove `isReturnInNanos` and `isForce` parameters from `getBalances` and `getBalance` methods
+- Add `getBalancesAvailable`, `getBalancesOnhold`, `getBalanceAvailable` and `getBalanceOnhold` to get balances by type
 - Create `CurrencyCode` type with known variants
 - Add `code` field to `Currency` type
-- Add 'unknown' variant for `CurrencyType`
+- Add `unknown` variant for `CurrencyType`
 - Replace `CurrencyType` by enum and store it in `Client` class
 - Rename `CurrencyType` to `DetailedCurrencyType` with more detailed variants
 - Use `CurrencyType` type to main types variants and store it in `Client` class

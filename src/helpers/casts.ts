@@ -1,7 +1,18 @@
-import { PaidBtnName, nonosToCoins } from './utils';
+import { PaidBtnName } from './utils';
+
+/** Result type value for {@link Client.getBalances} method */
+export type Balance = {
+  // Available balance
+  available: string,
+  // Balance on hold
+  onhold: string,
+};
 
 /** Result type for {@link Client.getBalances} method */
-export type Balances = { [key: string]: string };
+export type Balances = { [variant in CryptoCurrencyCode]: Balance };
+
+/** Result type for {@link Client.getBalances} method */
+export type BalancesType = { [variant in CryptoCurrencyCode]: string };
 
 // Crypto currency codes
 export type CryptoCurrencyCode =
@@ -211,29 +222,19 @@ export type Me = {
  * {@link Client.getBalances} method
  *
  * @param input - Backend API result
- * @param currencies - Currencies information from {@link Store.getCurrencies} method,
- *                     need to correct format output in coins by currencies decimals counts
- * @param isReturnInNanos - If true, return raw balances in nanos,
- *                          else return converted to coins balances
+ *
+ * @throws Error - If input parameter is not array
  *
  * @returns Converted result
  */
-export const toBalances = (
-  input: any, currencies: Currencies, isReturnInNanos: boolean,
-): Balances => {
-  if (!Array.isArray(input)) return {};
+export const toBalances = (input: any): Balances => {
+  if (!Array.isArray(input)) throw new Error(`Input is not array: ${JSON.stringify(input)}`);
 
   // Conver array to HashMap structure
   return input.reduce((accumulator: Balances, value: any): Balances => {
-    if (value.currency_code && value.available) {
-      accumulator[value.currency_code] = isReturnInNanos
-        ? value.available
-        : nonosToCoins(
-          value.available, value.currency_code, currencies,
-        );
-    }
+    accumulator[value.currency_code] = { available: value.available, onhold: value.onhold };
     return accumulator;
-  }, {});
+  }, {} as Balances);
 };
 
 /**
