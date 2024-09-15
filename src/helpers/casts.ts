@@ -184,29 +184,6 @@ export type Invoice = {
   paidFiatRate?: number,
 };
 
-/**
- * Invoices type object for {@link Client.getInvoices}
- * and {@link Client.getInvoicesPaginate} methods results
- */
-export type Invoices = {
-  /** All items count value */
-  count: number,
-  /** Fetched by passed filters items slice */
-  items: Invoice[],
-};
-
-/**
- * Invoices type object for {@link Client.getInvoicesPaginate} methods results
- */
-export type InvoicesPaginated = {
-  /** Pagination page number */
-  page: number,
-  /** Pagination pages count */
-  pagesCount: number,
-  /** Fetched by passed filters items slice */
-  items: Invoice[],
-};
-
 /** Result type object for {@link Client.getMe} method */
 export type Me = {
   /** App identifier */
@@ -361,37 +338,12 @@ export const toInvoice = (input: any): Invoice => {
  *
  * @returns Converted result
  */
-export const toInvoices = (input: any): Invoices => {
+export const toInvoices = (input: any): Invoice[] => {
   let items: Invoice[] = [];
 
   if (Array.isArray(input.items)) items = input.items.map(toInvoice);
 
-  return {
-    count: input.count || 0,
-    items,
-  };
-};
-
-/**
- * Convert backend API result to library result object to return in
- * {@link Client.getInvoicesPaginate} method
- *
- * @param input - Backend API result
- *
- * @returns Converted result
- */
-export const toInvoicesPaginated = (
-  page: number, pageSize: number, input: any,
-): InvoicesPaginated => {
-  let items: Invoice[] = [];
-
-  if (Array.isArray(input.items)) items = input.items.map(toInvoice);
-
-  return {
-    page,
-    pagesCount: Math.ceil((input.count || 0) / pageSize),
-    items,
-  };
+  return items;
 };
 
 /**

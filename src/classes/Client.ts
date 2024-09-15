@@ -1,7 +1,7 @@
 import {
   Balances, Balance, BalancesType, Currency, CurrencyCode, CryptoCurrencyCode, CurrencyType,
-  Currencies, DetailedCurrencyType, ExchangeRates, Invoice, Invoices, InvoicesPaginated,
-  InvoiceStatus, toBalances, toInvoice, toInvoices, toInvoicesPaginated,
+  Currencies, DetailedCurrencyType, ExchangeRates, Invoice,
+  InvoiceStatus, toBalances, toInvoice, toInvoices,
 } from '../helpers/casts';
 import {
   ApiMethod, CreateInvoiceOptions, GetInvoicesOptions, GetInvoicesPaginateOptions,
@@ -280,9 +280,9 @@ export default class Client extends Store {
    *
    * @returns Promise, what resolved to invoices information object
    */
-  getInvoices(options: GetInvoicesOptions = {}): Promise<Invoices> {
+  getInvoices(options: GetInvoicesOptions = {}): Promise<Invoice[]> {
     return this._transport.call('getInvoices', prepareGetInvoicesOptions(options))
-      .then((result: any): Invoices => toInvoices(result));
+      .then((result: any): Invoice[] => toInvoices(result));
   }
 
   /**
@@ -302,13 +302,11 @@ export default class Client extends Store {
    *
    * @returns Promise, what resolved to invoices information object
    */
-  getInvoicesPaginate(options: GetInvoicesPaginateOptions = {}): Promise<InvoicesPaginated> {
+  getInvoicesPaginate(options: GetInvoicesPaginateOptions = {}): Promise<Invoice[]> {
     const prepared = prepareGetInvoicesPaginateOptions(this._pageSize, options);
 
     return this._transport.call('getInvoices', prepared)
-      .then((result: any): InvoicesPaginated => {
-        return toInvoicesPaginated(options.page, this._pageSize, result);
-      });
+      .then((result: any): Invoice[] => toInvoices(result));
   }
 
   /**

@@ -2,6 +2,8 @@
 
 ## Unreleased changes
 
+- Change methods `getInvoices` and `getInvoicesPaginate` to returns array of `Invoice`
+- Remove `currency` field from `GetInvoicesOptions` and `GetInvoicesPaginateOptions` types and add `asset` and `fiat` fields
 - Update `Invoice` type to actual API version
 - Update `createInvoice` method to actual API version, change related options types
 - Add `deleteInvoice` and `deleteCheck` methods

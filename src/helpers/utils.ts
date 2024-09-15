@@ -72,8 +72,10 @@ export type CreateInvoiceBackendOptions = {
 
 /** Options object type for {@link Client.getInvoices} method */
 export type GetInvoicesOptions = {
-  /** Invoices currency filter */
-  currency?: CryptoCurrencyCode,
+  /** Invoices crypto currency filter */
+  asset?: CryptoCurrencyCode,
+  /** Invoices fiat currency filter */
+  fiat?: FiatCurrencyCode,
   /** Invoices identifiers filter */
   ids?: (number | string)[],
   /** Invoices status filter */
@@ -86,8 +88,10 @@ export type GetInvoicesOptions = {
 
 /** Options object type for {@link Client.getInvoicesPaginate} method */
 export type GetInvoicesPaginateOptions = {
-  /** Invoices currency filter */
-  currency?: CryptoCurrencyCode,
+  /** Invoices crypto currency filter */
+  asset?: CryptoCurrencyCode,
+  /** Invoices fiat currency filter */
+  fiat?: FiatCurrencyCode,
   /** Invoices identifiers filter */
   ids?: (number | string)[],
   /** Invoices status filter */
@@ -98,8 +102,10 @@ export type GetInvoicesPaginateOptions = {
 
 /** Backend options object type for {@link Client.getInvoices} method */
 export type GetInvoicesBackendOptions = {
-  /** Invoices currency filter */
+  /** Invoices crypto currency filter */
   asset?: CryptoCurrencyCode,
+  /** Invoices fiat currency filter */
+  fiat?: FiatCurrencyCode,
   /** Invoices identifiers filter */
   invoice_ids?: number[],
   /** Invoices status filter */
@@ -301,7 +307,8 @@ export const prepareGetInvoicesOptions = (
   if (options.count !== undefined) prepared.count = options.count;
 
   // Different names
-  if (options.currency !== undefined) prepared.asset = options.currency;
+  if (options.asset !== undefined) prepared.asset = options.asset;
+  if (options.fiat !== undefined) prepared.fiat = options.fiat;
   if (options.ids !== undefined) {
     prepared.invoice_ids = options.ids.map((value: number | string): number => +value);
   }
@@ -327,7 +334,8 @@ export const prepareGetInvoicesPaginateOptions = (
   if (options.status !== undefined) prepared.status = options.status;
 
   // Different names
-  if (options.currency !== undefined) prepared.asset = options.currency;
+  if (options.asset !== undefined) prepared.asset = options.asset;
+  if (options.fiat !== undefined) prepared.fiat = options.fiat;
   if (options.ids !== undefined) {
     prepared.invoice_ids = options.ids.map((value: number | string): number => +value);
   }
