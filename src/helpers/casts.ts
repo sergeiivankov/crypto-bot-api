@@ -85,7 +85,7 @@ export type ExchangeRate = {
   /** Target currency code */
   target: string,
   /** Source to target exchange rate */
-  rate: number,
+  rate: string,
 };
 
 /** Result type for {@link Store.getExchangeRates} method */
@@ -263,7 +263,7 @@ export const toExchangeRates = (input: any): ExchangeRates => {
   return input.map((value: any): ExchangeRate => ({
     source: value.source || '',
     target: value.target || '',
-    rate: parseFloat(value.rate),
+    rate: value.rate,
   }));
 };
 

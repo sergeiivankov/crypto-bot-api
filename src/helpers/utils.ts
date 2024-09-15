@@ -1,5 +1,5 @@
 import {
-  Currencies, CurrencyType, CryptoCurrencyCode, FiatCurrencyCode, InvoiceStatus, ExchangeRates,
+  CurrencyType, CryptoCurrencyCode, FiatCurrencyCode, InvoiceStatus, ExchangeRates,
 } from './casts';
 
 /** Possible backend API methods names */
@@ -143,14 +143,13 @@ export type PaidBtnName = 'viewItem' | 'openChannel' | 'openBot' | 'callback';
  * @param source - Source currency code
  * @param target - Target currency code
  * @param exchangeRates - Exchange rates information from {@link Store.getExchangeRates} method
- * @param currencies - Currencies information from {@link Store.getCurrencies} method
  *
  * @returns Exchange rate or zero, if currencies pair not exists
  */
 export const getExchageRate = (
-  source: string, target: string, exchangeRates: ExchangeRates, currencies: Currencies,
-): number => {
-  let rate: number = NaN;
+  source: string, target: string, exchangeRates: ExchangeRates,
+): string => {
+  let rate: string = '';
   for (let i = 0, l = exchangeRates.length; i < l; i += 1) {
     const exchangeRate = exchangeRates[i];
 
@@ -159,18 +158,11 @@ export const getExchageRate = (
       rate = exchangeRate.rate;
       break;
     }
-
-    // If source and target reverse to direction in Store.getExchangeRates method result
-    if (exchangeRate.source === target && exchangeRate.target === source) {
-      rate = 1 / exchangeRate.rate;
-      break;
-    }
   }
 
-  if (isNaN(rate)) return 0;
+  if (rate === '') return '0';
 
-  const numberOfNanosSigns = currencies[target]?.decimals || 8;
-  return parseFloat(rate.toFixed(numberOfNanosSigns));
+  return rate;
 };
 
 /**

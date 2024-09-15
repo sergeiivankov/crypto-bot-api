@@ -217,10 +217,10 @@ export default class Client extends Store {
    */
   getExchangeRate(
     source: string, target: string, isForce: boolean = false,
-  ): Promise<number> {
-    return Promise.all([this.getCurrencies(isForce), this.getExchangeRates(isForce)])
-      .then(([currencies, exchangeRates]: [Currencies, ExchangeRates]): number => {
-        return getExchageRate(source, target, exchangeRates, currencies);
+  ): Promise<string> {
+    return this.getExchangeRates(isForce)
+      .then((exchangeRates: ExchangeRates): string => {
+        return getExchageRate(source, target, exchangeRates);
       });
   }
 
