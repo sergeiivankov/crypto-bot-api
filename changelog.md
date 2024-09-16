@@ -2,7 +2,7 @@
 
 ## Unreleased changes
 
-- Add `getStats`, `createCheck`, `getChecks`, `getChecksPaginate`, `deleteInvoice` and `deleteCheck` methods
+- Add `getStats`, `createCheck`, `getChecks`, `getChecksPaginate`, `transfer`, `getTransfers`, `getTransfersPaginate`, `deleteInvoice` and `deleteCheck` methods
 - Change methods `getInvoices` and `getInvoicesPaginate` to returns array of `Invoice`
 - Remove `currency` field from `GetInvoicesOptions` and `GetInvoicesPaginateOptions` types and add `asset` and `fiat` fields
 - Update `Invoice` type to actual API version

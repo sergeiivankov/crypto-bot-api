@@ -1,14 +1,17 @@
 import {
   Balances, Balance, BalancesType, Currency, CurrencyCode, CryptoCurrencyCode, CurrencyType,
-  Currencies, DetailedCurrencyType, ExchangeRates, Invoice, Check, Stats,
-  InvoiceStatus, CheckStatus, toBalances, toInvoice, toCheck, toInvoices, toChecks, toStats,
+  Currencies, DetailedCurrencyType, ExchangeRates, Invoice, Check, Stats, Transfer, InvoiceStatus,
+  CheckStatus, TransferStatus, toBalances, toInvoice, toCheck, toTransfer, toInvoices, toChecks,
+  toTransfers, toStats,
 } from '../helpers/casts';
 import {
   ApiMethod, CreateInvoiceOptions, CreateCheckOptions, GetChecksOptions, GetChecksPaginateOptions,
-  GetInvoicesOptions, GetInvoicesPaginateOptions, GetStatsOptions, getExchageRate,
+  GetInvoicesOptions, GetInvoicesPaginateOptions, GetStatsOptions, TransferOptions,
+  GetTransfersOptions, GetTransfersPaginateOptions, getExchageRate,
   prepareCreateInvoiceOptions, prepareDeleteOptions, prepareGetInvoicesOptions,
   prepareGetInvoicesPaginateOptions, prepareGetStatsOptions, prepareCreateCheckOptions,
-  prepareGetChecksOptions, prepareGetChecksPaginateOptions,
+  prepareGetChecksOptions, prepareGetChecksPaginateOptions, prepareTransferOptions,
+  prepareGetTransfersOptions, prepareGetTransfersPaginateOptions,
 } from '../helpers/utils';
 import Store from './Store';
 
@@ -48,6 +51,12 @@ export default class Client extends Store {
    * {@link Client.getChecks} and {@link Client.getChecksPaginate} methods options
    */
   public static CheckStatus: typeof CheckStatus = CheckStatus;
+
+  /**
+   * Access to {@link TransferStatus} enumeration, used in {@link Transfer} type,
+   * {@link Client.getTransfers} and {@link Client.getTransfersPaginate} methods options
+   */
+  public static TransferStatus: typeof TransferStatus = TransferStatus;
 
   /**
    * Return count invoices per page for {@link Client.getInvoicesPaginate} method
@@ -249,6 +258,24 @@ export default class Client extends Store {
   }
 
   /**
+   * Transfer
+   *
+   * Use {@link toTransfer} backend API result convert function and
+   * prepare backend API parameters {@link prepareTransferOptions} function
+   *
+   * @param options - Transfer options
+   *
+   * @throws Error - If there is an error sending request to backend API, parsing response error
+   *                 or options object is invalid
+   *
+   * @returns Promise, what resolved to completed transfer information object
+   */
+  transfer(options: TransferOptions): Promise<Transfer> {
+    return this._transport.call('transfer', prepareTransferOptions(options))
+      .then((result: any): Transfer => toTransfer(result));
+  }
+
+  /**
    * Create invoice
    *
    * Use {@link toInvoice} backend API result convert function and
@@ -390,6 +417,47 @@ export default class Client extends Store {
 
     return this._transport.call('getChecks', prepared)
       .then((result: any): Check[] => toChecks(result));
+  }
+
+  /**
+   * Get transfers
+   *
+   * Use {@link toTransfers} backend API result convert function and
+   * prepare backend API parameters {@link prepareGetTransfersOptions} function
+   *
+   * @param options - Filters options
+   *
+   * @throws Error - If there is an error sending request to backend API or parsing response
+   *
+   * @returns Promise, what resolved to transfers information object
+   */
+  getTransfers(options: GetTransfersOptions = {}): Promise<Transfer[]> {
+    return this._transport.call('getTransfers', prepareGetTransfersOptions(options))
+      .then((result: any): Transfer[] => toTransfers(result));
+  }
+
+  /**
+   * Get transfers paginated
+   *
+   * Fetch checks with `page` options parameter, except `count` and `offset`
+   *
+   * See {@link Client.getPageSize} and {@link Client.setPageSize}
+   *
+   * Use {@link toTransfers} backend API result convert function and
+   * prepare backend API parameters {@link prepareGetTransfersOptions} function
+   *
+   * @param options - Filters options
+   *
+   * @throws Error - If there is an error sending request to backend API, parsing response error
+   *                 or options object is invalid
+   *
+   * @returns Promise, what resolved to transfers information object
+   */
+  getTransfersPaginate(options: GetTransfersPaginateOptions = {}): Promise<Transfer[]> {
+    const prepared = prepareGetTransfersPaginateOptions(this._pageSize, options);
+
+    return this._transport.call('getTransfers', prepared)
+      .then((result: any): Transfer[] => toTransfers(result));
   }
 
   /**

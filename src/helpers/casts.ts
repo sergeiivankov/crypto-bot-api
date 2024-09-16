@@ -58,6 +58,12 @@ export enum CheckStatus {
   Unknown = 'unknown',
 }
 
+/** Possible transfer statuses */
+export enum TransferStatus {
+  Completed = 'completed',
+  Unknown = 'unknown',
+}
+
 /**
  * Currency type object for {@link Store.getCurrencies}
  * and {@link Client.getCurrency} methods results
@@ -99,6 +105,30 @@ export type ExchangeRate = {
 
 /** Result type for {@link Store.getExchangeRates} method */
 export type ExchangeRates = ExchangeRate[];
+
+/**
+ * Transfer type object for {@link Client.getTransfers} and {@link Client.transfer} methods results
+ */
+export type Transfer = {
+  /** Transfer identifier */
+  id: number,
+  /**
+   * Transfer spend identifier, optional because not returned from `transfer` API method call
+   */
+  spendId?: string,
+  /** Telegram user ID the transfer was sent to */
+  userId: number,
+  /** Transfer asset */
+  asset: CryptoCurrencyCode,
+  /** Transfer amount */
+  amount: string,
+  /** Transfer status */
+  status: TransferStatus,
+  /** Transfer completed date */
+  completedAt: Date,
+  /** Check activated date */
+  comment?: string,
+};
 
 /**
  * Check type object for {@link Client.getChecks}, {@link Client.getChecksPaginate}
@@ -426,6 +456,30 @@ export const toCheck = (input: any): Check => {
 
 /**
  * Convert backend API result to library result object to return in
+ * {@link Client.transfer} method and {@link toTransfers} function
+ *
+ * @param input - Backend API result
+ *
+ * @returns Converted result
+ */
+export const toTransfer = (input: any): Transfer => {
+  const transfer: Transfer = {
+    id: input.transfer_id || 0,
+    userId: input.user_id || 0,
+    asset: input.asset || '',
+    amount: input.amount || '0',
+    status: input.status || TransferStatus.Unknown,
+    completedAt: new Date(input.completed_at),
+  };
+
+  if (input.spend_id !== undefined) transfer.spendId = input.spend_id;
+  if (input.comment !== undefined) transfer.comment = input.comment;
+
+  return transfer;
+};
+
+/**
+ * Convert backend API result to library result object to return in
  * {@link Client.getInvoices} and {@link Client.getInvoicesPaginate}
  * methods
  *
@@ -454,6 +508,23 @@ export const toChecks = (input: any): Check[] => {
   let items: Check[] = [];
 
   if (Array.isArray(input.items)) items = input.items.map(toCheck);
+
+  return items;
+};
+
+/**
+ * Convert backend API result to library result object to return in
+ * {@link Client.getTransfers} and {@link Client.getTransfersPaginate}
+ * methods
+ *
+ * @param input - Backend API result
+ *
+ * @returns Converted result
+ */
+export const toTransfers = (input: any): Transfer[] => {
+  let items: Transfer[] = [];
+
+  if (Array.isArray(input.items)) items = input.items.map(toTransfer);
 
   return items;
 };

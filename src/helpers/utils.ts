@@ -5,7 +5,8 @@ import {
 /** Possible backend API methods names */
 export type ApiMethod =
   'getMe' | 'getStats' | 'createInvoice' | 'createCheck' | 'deleteInvoice' | 'deleteCheck' |
-  'getInvoices' | 'getChecks' | 'getBalance' | 'getExchangeRates' | 'getCurrencies';
+  'getInvoices' | 'getChecks' | 'getBalance' | 'getExchangeRates' | 'getCurrencies' | 'transfer' |
+  'getTransfers';
 
 /** Options object type for {@link Client.getStats} method */
 export type GetStatsOptions = {
@@ -23,11 +24,57 @@ export type GetStatsBackendOptions = {
   end_at?: string,
 };
 
+/** Options object type for {@link Client.transfer} method */
+export type TransferOptions = {
+  /** User ID in Telegram */
+  userId: number,
+  /** Transfer asset */
+  asset: CryptoCurrencyCode,
+  /** Transfer amount */
+  amount: number | string,
+  /**
+   * Random UTF-8 string unique per transfer for idempotent requests.
+   * The same spend_id can be accepted only once from your app.
+   * Up to 64 symbols.
+   */
+  spendId: string,
+  /**
+   * Comment for the transfer.
+   * Users will see this comment in the notification about the transfer
+   */
+  comment?: string,
+  /** Pass true to not send to the user the notification about the transfer */
+  disableSendNotification?: boolean,
+};
+
+/** Backend options object type for {@link Client.transfer} method */
+export type TransferBackendOptions = {
+  /** User ID in Telegram */
+  user_id: number,
+  /** Transfer asset */
+  asset: CryptoCurrencyCode,
+  /** Transfer amount */
+  amount: number | string,
+  /**
+   * Random UTF-8 string unique per transfer for idempotent requests.
+   * The same spend_id can be accepted only once from your app.
+   * Up to 64 symbols.
+   */
+  spend_id: string,
+  /**
+   * Comment for the transfer.
+   * Users will see this comment in the notification about the transfer
+   */
+  comment?: string,
+  /** Pass true to not send to the user the notification about the transfer */
+  disable_send_notification?: boolean,
+};
+
 /** Options object type for {@link Client.createCheck} method */
 export type CreateCheckOptions = {
-  /** Invoice asset */
+  /** Check asset */
   asset: CryptoCurrencyCode,
-  /** Invoice amount */
+  /** Check amount */
   amount: number | string,
   /** ID of the user who will be able to activate the check */
   pinToUserId?: number,
@@ -140,7 +187,10 @@ export type GetInvoicesPaginateOptions = {
   page?: number,
 };
 
-/** Backend options object type for {@link Client.getInvoices} method */
+/**
+ * Backend options object type for {@link Client.getInvoices}
+ * and {@link Client.getInvoicesPaginate} methods
+ */
 export type GetInvoicesBackendOptions = {
   /** Invoices crypto currency filter */
   asset?: CryptoCurrencyCode,
@@ -182,7 +232,10 @@ export type GetChecksPaginateOptions = {
   page?: number,
 };
 
-/** Backend options object type for {@link Client.getChecks} method */
+/**
+ * Backend options object type for {@link Client.getChecks}
+ * and {@link Client.getChecksPaginate} methods
+ */
 export type GetChecksBackendOptions = {
   /** Checks asset filter */
   asset?: CryptoCurrencyCode,
@@ -193,6 +246,49 @@ export type GetChecksBackendOptions = {
   /** Number of checks to skip */
   offset?: number,
   /** Number of checks returned */
+  count?: number,
+};
+
+/** Options object type for {@link Client.getTransfers} method */
+export type GetTransfersOptions = {
+  /** Transfer asset filter */
+  asset?: CryptoCurrencyCode,
+  /** Transfers identifiers filter */
+  ids?: number[],
+  /** Transfer spend identifier */
+  spendId?: string,
+  /** Number of transfers to skip */
+  offset?: number,
+  /** Number of transfers returned */
+  count?: number,
+};
+
+/** Options object type for {@link Client.getTransfersPaginate} method */
+export type GetTransfersPaginateOptions = {
+  /** Transfer asset filter */
+  asset?: CryptoCurrencyCode,
+  /** Transfers identifiers filter */
+  ids?: number[],
+  /** Transfer spend identifier */
+  spendId?: string,
+  /** Pagination page number */
+  page?: number,
+};
+
+/**
+ * Backend options object type for {@link Client.getTransfers}
+ * and {@link Client.getTransfersPaginate} methods
+ */
+export type GetTransfersBackendOptions = {
+  /** Transfer asset filter */
+  asset?: CryptoCurrencyCode,
+  /** Transfers identifiers filter */
+  transfer_ids?: string,
+  /** Transfer spend identifier */
+  spend_id?: string,
+  /** Number of transfers to skip */
+  offset?: number,
+  /** Number of transfers returned */
   count?: number,
 };
 
@@ -294,6 +390,49 @@ export const prepareGetStatsOptions = (options: GetStatsOptions): GetStatsBacken
   return prepared;
 };
 
+/**
+ * Convert {@link CreateCheckOptions} object to using backend API method
+ * parameters {@link CreateCheckBackendOptions} object
+ *
+ * @param options - Library {@link Client.createCheck} method options object
+ *
+ * @throws Error - If options object invalid
+ *
+ * @returns Object with corresponding backend API method parameters
+ */
+export const prepareTransferOptions = (
+  options: TransferOptions,
+): TransferBackendOptions => {
+  if (options.comment !== undefined && options.comment.length > 1024) {
+    throw new Error('Comment can\'t be longer than 1024 characters');
+  }
+
+  // Create object with required parameters
+  const prepared: TransferBackendOptions = {
+    user_id: options.userId,
+    spend_id: options.spendId,
+    asset: options.asset,
+    amount: typeof options.amount === 'number' ? '' + options.amount : options.amount,
+  };
+
+  if (options.disableSendNotification !== undefined) {
+    prepared.disable_send_notification = options.disableSendNotification;
+  }
+  if (options.comment !== undefined) prepared.comment = options.comment;
+
+  return prepared;
+};
+
+/**
+ * Convert {@link CreateCheckOptions} object to using backend API method
+ * parameters {@link CreateCheckBackendOptions} object
+ *
+ * @param options - Library {@link Client.createCheck} method options object
+ *
+ * @throws Error - If options object invalid
+ *
+ * @returns Object with corresponding backend API method parameters
+ */
 export const prepareCreateCheckOptions = (
   options: CreateCheckOptions,
 ): CreateCheckBackendOptions => {
@@ -444,7 +583,7 @@ export const prepareGetInvoicesOptions = (
  * Convert {@link GetInvoicesPaginateOptions} object to using backend API method
  * parameters {@link GetInvoicesBackendOptions} object
  *
- * @param options - Library {@link Client.getInvoices} method options object
+ * @param options - Library {@link Client.getInvoicesPaginate} method options object
  *
  * @returns Object with corresponding backend API method parameters
  */
@@ -501,7 +640,7 @@ export const prepareGetChecksOptions = (
  * Convert {@link GetChecksPaginateOptions} object to using backend API method
  * parameters {@link GetChecksBackendOptions} object
  *
- * @param options - Library {@link Client.getChecks} method options object
+ * @param options - Library {@link Client.getChecksPaginate} method options object
  *
  * @returns Object with corresponding backend API method parameters
  */
@@ -517,6 +656,60 @@ export const prepareGetChecksPaginateOptions = (
   // Different names
   if (options.asset !== undefined) prepared.asset = options.asset;
   if (options.ids !== undefined) prepared.check_ids = options.ids.join(',');
+
+  // Paginate options
+  let page = options.page ? +options.page : 1;
+  if (page < 1) page = 1;
+  prepared.count = pageSize;
+  prepared.offset = pageSize * (page - 1);
+
+  return prepared;
+};
+
+/**
+ * Convert {@link GetTransfersOptions} object to using backend API method
+ * parameters {@link GetTransfersBackendOptions} object
+ *
+ * @param options - Library {@link Client.getTransfers} method options object
+ *
+ * @returns Object with corresponding backend API method parameters
+ */
+export const prepareGetTransfersOptions = (
+  options: GetTransfersOptions,
+): GetTransfersBackendOptions => {
+  // Create empty object, method doesn't have required parameters
+  const prepared: GetTransfersBackendOptions = {};
+
+  // Same names
+  if (options.offset !== undefined) prepared.offset = options.offset;
+  if (options.count !== undefined) prepared.count = options.count;
+
+  // Different names
+  if (options.asset !== undefined) prepared.asset = options.asset;
+  if (options.spendId !== undefined) prepared.spend_id = options.spendId;
+  if (options.ids !== undefined) prepared.transfer_ids = options.ids.join(',');
+
+  return prepared;
+};
+
+/**
+ * Convert {@link GetTransfersPaginateOptions} object to using backend API method
+ * parameters {@link GetTransfersBackendOptions} object
+ *
+ * @param options - Library {@link Client.getTransfersPaginate} method options object
+ *
+ * @returns Object with corresponding backend API method parameters
+ */
+export const prepareGetTransfersPaginateOptions = (
+  pageSize: number, options: GetTransfersPaginateOptions,
+): GetTransfersBackendOptions => {
+  // Create empty object, method doesn't have required parameters
+  const prepared: GetTransfersBackendOptions = {};
+
+  // Different names
+  if (options.asset !== undefined) prepared.asset = options.asset;
+  if (options.spendId !== undefined) prepared.spend_id = options.spendId;
+  if (options.ids !== undefined) prepared.transfer_ids = options.ids.join(',');
 
   // Paginate options
   let page = options.page ? +options.page : 1;
