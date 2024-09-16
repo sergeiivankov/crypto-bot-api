@@ -96,7 +96,7 @@ $ npm run watch # To watch all
 ## Resources
 
 * [Documentation](https://sergeiivankov.github.io/crypto-bot-api/)
-* [Examples](https://github.com/sergeiivankov/crypto-bot-api/examples)
+* [Examples](https://github.com/sergeiivankov/crypto-bot-api/tree/main/examples)
 * [Changelog](https://github.com/sergeiivankov/crypto-bot-api/blob/main/changelog.md)
 * [Backend CryptoBot API description](https://help.crypt.bot/crypto-pay-api)
 
