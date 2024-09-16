@@ -87,16 +87,12 @@ export type Currencies = { [variant in CurrencyCode]?: Currency };
 /**
  * Exchange rate type object for {@link Store.getExchangeRates}
  * and {@link Client.getExchangeRate} methods results
- *
- * @remarks
- * Used strings for currencies codes instead of {@link InvoiceCurrency},
- * because exchange rates contains fiat currencies, who do not take part in other methods
  */
 export type ExchangeRate = {
   /** Source currency code */
-  source: string,
+  source: CurrencyCode,
   /** Target currency code */
-  target: string,
+  target: CurrencyCode,
   /** Source to target exchange rate */
   rate: string,
   /** True, if the received rate is up-to-date */
@@ -258,7 +254,7 @@ export type Invoice = {
   paidFiatRate?: number,
 };
 
-/** Result type object for {@link Store.getStats} method */
+/** Result type object for {@link Client.getStats} method */
 export type Stats = {
   /** Total volume of paid invoices in USD */
   volume: string,
@@ -531,7 +527,7 @@ export const toTransfers = (input: any): Transfer[] => {
 
 /**
  * Convert backend API result to library result object to return in
- * {@link Store.getStats} method
+ * {@link Client.getStats} method
  *
  * @param input - Backend API result
  *
