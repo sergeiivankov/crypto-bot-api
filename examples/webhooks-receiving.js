@@ -7,7 +7,7 @@ const onPaid = (invoice, requestDate) => {
   console.log(requestDate, invoice);
 };
 
-// Important: at the time of publication of version 0.2.0 (Dec 9, 2021),
+// Important: at the time of publication of version 0.3.0 (Sep 16, 2024),
 // API servers do not accept self-signed certificates
 client.createServer({
   key: readFileSync(__dirname + '/server.key'),

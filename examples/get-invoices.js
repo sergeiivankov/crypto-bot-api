@@ -7,5 +7,5 @@ client.getInvoices()
   .then(invoices => console.log(invoices));
 
 // With filters
-client.getInvoices({ currency: 'TON', status: 'active', count: 5 })
+client.getInvoices({ asset: 'TON', status: 'active', count: 5 })
   .then(invoices => console.log(invoices));

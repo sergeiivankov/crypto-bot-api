@@ -12,9 +12,9 @@ client.on('paid', (invoice, requestDate) => {
 
 app.use('/secret', client.middleware());
 
-// Important: at the time of publication of version 0.2.0 (Dec 9, 2021),
+// Important: at the time of publication of version 0.3.0 (Sep 16, 2024),
 // API servers do not accept self-signed certificates
 createServer({
-  key: readFileSync('/etc/letsencrypt/live/studiot.ru/privkey.pem'),
-  cert: readFileSync('/etc/letsencrypt/live/studiot.ru/fullchain.pem')
+  key: readFileSync(__dirname + '/server.key'),
+  cert: readFileSync(__dirname + '/server.cert')
 }, app).listen(443);
