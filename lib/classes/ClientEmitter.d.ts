@@ -1,4 +1,3 @@
-/// <reference types="node" />
 import { ListenOptions } from 'net';
 import { IncomingMessage } from 'http';
 import { ServerOptions } from 'https';
@@ -37,12 +36,12 @@ declare class ClientEmitter extends Client {
     private _server;
     /** Event listeners store */
     private _events;
-    /** @inheritdoc */
+    /** {@inheritDoc Client:constructor} */
     constructor(apiKey: string, endpoint?: string);
     /**
      * Create handling webhooks server
      *
-     * Important: at the time of publication of version 0.2.0 (Dec 9, 2021),
+     * Important: at the time of publication of version 0.3.0 (Sep 16, 2024),
      * API servers do not accept self-signed certificates
      *
      * @param serverOptions - Node.js built-in server options

@@ -1,7 +1,7 @@
 var CryptoBotAPI = (function () {
     'use strict';
 
-    /*! *****************************************************************************
+    /******************************************************************************
     Copyright (c) Microsoft Corporation.
 
     Permission to use, copy, modify, and/or distribute this software for any
@@ -15,7 +15,7 @@ var CryptoBotAPI = (function () {
     OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
     PERFORMANCE OF THIS SOFTWARE.
     ***************************************************************************** */
-    /* global Reflect, Promise */
+    /* global Reflect, Promise, SuppressedError, Symbol, Iterator */
 
     var extendStatics = function(d, b) {
         extendStatics = Object.setPrototypeOf ||
@@ -32,37 +32,342 @@ var CryptoBotAPI = (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     }
 
+    typeof SuppressedError === "function" ? SuppressedError : function (error, suppressed, message) {
+        var e = new Error(message);
+        return e.name = "SuppressedError", e.error = error, e.suppressed = suppressed, e;
+    };
+
+    /** Possible currency types */
+    var CurrencyType;
+    (function (CurrencyType) {
+        CurrencyType["Crypto"] = "crypto";
+        CurrencyType["Fiat"] = "fiat";
+        CurrencyType["Unknown"] = "unknown";
+    })(CurrencyType || (CurrencyType = {}));
+    /** Possible detailed currency types */
+    var DetailedCurrencyType;
+    (function (DetailedCurrencyType) {
+        DetailedCurrencyType["Blockchain"] = "blockchain";
+        DetailedCurrencyType["Stablecoin"] = "stablecoin";
+        DetailedCurrencyType["Fiat"] = "fiat";
+        DetailedCurrencyType["Unknown"] = "unknown";
+    })(DetailedCurrencyType || (DetailedCurrencyType = {}));
+    /** Possible invoice statuses */
+    var InvoiceStatus;
+    (function (InvoiceStatus) {
+        InvoiceStatus["Active"] = "active";
+        InvoiceStatus["Paid"] = "paid";
+        InvoiceStatus["Expired"] = "expired";
+        InvoiceStatus["Unknown"] = "unknown";
+    })(InvoiceStatus || (InvoiceStatus = {}));
+    /** Possible check statuses */
+    var CheckStatus;
+    (function (CheckStatus) {
+        CheckStatus["Active"] = "active";
+        CheckStatus["Activated"] = "activated";
+        CheckStatus["Unknown"] = "unknown";
+    })(CheckStatus || (CheckStatus = {}));
+    /** Possible transfer statuses */
+    var TransferStatus;
+    (function (TransferStatus) {
+        TransferStatus["Completed"] = "completed";
+        TransferStatus["Unknown"] = "unknown";
+    })(TransferStatus || (TransferStatus = {}));
+    /**
+     * Convert backend API result to library result object to return in
+     * {@link Client.getBalances} method
+     *
+     * @param input - Backend API result
+     *
+     * @throws Error - If input parameter is not array
+     *
+     * @returns Converted result
+     */
+    var toBalances = function (input) {
+        if (!Array.isArray(input))
+            throw new Error("Input is not array: ".concat(JSON.stringify(input)));
+        // Conver array to HashMap structure
+        return input.reduce(function (accumulator, value) {
+            accumulator[value.currency_code] = { available: value.available, onhold: value.onhold };
+            return accumulator;
+        }, {});
+    };
+    /**
+     * Convert backend API result to library result object to return in
+     * {@link Store.getCurrencies} method
+     *
+     * @param input - Backend API result
+     *
+     * @returns Converted result
+     */
+    var toCurrencies = function (input) {
+        if (!Array.isArray(input))
+            return {};
+        return input.reduce(function (accumulator, value) {
+            if (value.code) {
+                var code = value.code.toString();
+                var type = DetailedCurrencyType.Unknown;
+                if (value.is_blockchain)
+                    type = DetailedCurrencyType.Blockchain;
+                if (value.is_fiat)
+                    type = DetailedCurrencyType.Fiat;
+                if (value.is_stablecoin)
+                    type = DetailedCurrencyType.Stablecoin;
+                var currency = {
+                    code: code,
+                    name: value.name || '',
+                    decimals: value.decimals || 0,
+                    type: type,
+                };
+                if (Object.prototype.hasOwnProperty.call(value, 'url'))
+                    currency.url = value.url;
+                accumulator[code] = currency;
+            }
+            return accumulator;
+        }, {});
+    };
+    /**
+     * Convert backend API result to library result object to return in
+     * {@link Store.getExchangeRates} method result
+     *
+     * @param input - Backend API result
+     *
+     * @returns Converted result
+     */
+    var toExchangeRates = function (input) {
+        if (!Array.isArray(input))
+            return [];
+        return input.map(function (value) { return ({
+            source: value.source || '',
+            target: value.target || '',
+            rate: value.rate,
+            isValid: value.is_valid,
+        }); });
+    };
+    /**
+     * Convert backend API result to library result object to return in
+     * {@link Client.createInvoice} method, {@link toInvoices} function
+     * and {@link ClientEmitter} `paid` event emit
+     *
+     * @param input - Backend API result
+     *
+     * @returns Converted result
+     */
+    var toInvoice = function (input) {
+        var invoice = {
+            id: input.invoice_id || 0,
+            status: input.status || InvoiceStatus.Unknown,
+            hash: input.hash || '',
+            currencyType: input.currency_type || '',
+            currency: input.asset || input.fiat || '',
+            amount: input.amount || '0',
+            isAllowComments: input.allow_comments || false,
+            isAllowAnonymous: input.allow_anonymous || false,
+            createdAt: new Date(input.created_at),
+            botPayUrl: input.bot_invoice_url || '',
+            miniAppPayUrl: input.mini_app_invoice_url || '',
+            webAppPayUrl: input.web_app_invoice_url || '',
+        };
+        if (invoice.currencyType === CurrencyType.Crypto) {
+            invoice.currency = input.asset || '';
+        }
+        if (invoice.currencyType === CurrencyType.Fiat) {
+            invoice.currency = input.fiat || '';
+        }
+        if (input.hidden_message !== undefined)
+            invoice.hiddenMessage = input.hidden_message;
+        if (input.paid_anonymously !== undefined)
+            invoice.isPaidAnonymously = input.paid_anonymously;
+        if (input.expiration_date !== undefined)
+            invoice.expirationDate = new Date(input.expiration_date);
+        if (input.paid_at !== undefined)
+            invoice.paidAt = new Date(input.paid_at);
+        if (input.description !== undefined)
+            invoice.description = input.description;
+        if (input.paid_btn_name !== undefined)
+            invoice.paidBtnName = input.paid_btn_name;
+        if (input.paid_btn_url !== undefined)
+            invoice.paidBtnUrl = input.paid_btn_url;
+        if (input.comment !== undefined)
+            invoice.comment = input.comment;
+        if (input.paid_usd_rate !== undefined)
+            invoice.usdRate = parseFloat(input.paid_usd_rate) || 0;
+        if (input.fee_asset !== undefined)
+            invoice.feeAsset = input.fee_asset || '';
+        if (input.fee_amount !== undefined)
+            invoice.fee = input.fee_amount || 0;
+        if (input.accepted_assets !== undefined)
+            invoice.acceptedAssets = input.accepted_assets;
+        if (input.paid_asset !== undefined)
+            invoice.paidAsset = input.paid_asset || '';
+        if (input.paid_amount !== undefined)
+            invoice.paidAmount = parseFloat(input.paid_amount) || 0;
+        if (input.paid_fiat_rate !== undefined)
+            invoice.paidFiatRate = parseFloat(input.paid_fiat_rate) || 0;
+        if (input.payload !== undefined) {
+            var payload = void 0;
+            try {
+                payload = JSON.parse(input.payload);
+            }
+            catch (_a) {
+                payload = input.payload;
+            }
+            invoice.payload = payload;
+        }
+        return invoice;
+    };
+    /**
+     * Convert backend API result to library result object to return in
+     * {@link Client.createCheck} method and {@link toChecks} function
+     *
+     * @param input - Backend API result
+     *
+     * @returns Converted result
+     */
+    var toCheck = function (input) {
+        var check = {
+            id: input.check_id || 0,
+            hash: input.hash || '',
+            asset: input.asset || '',
+            amount: input.amount || '0',
+            botCheckUrl: input.bot_check_url || '',
+            status: input.status || CheckStatus.Unknown,
+            createdAt: new Date(input.created_at),
+        };
+        if (input.activated_at !== undefined)
+            check.activatedAt = new Date(input.activated_at);
+        if (input.pin_to_user !== undefined && input.pin_to_user.pin_by !== undefined) {
+            if (input.pin_to_user.pin_by === 'id' && input.pin_to_user.user_id !== undefined) {
+                check.pinToUserId = input.pin_to_user.user_id;
+            }
+            if (input.pin_to_user.pin_by === 'username' && input.pin_to_user.username !== undefined) {
+                check.pinToUsername = input.pin_to_user.username;
+            }
+        }
+        return check;
+    };
+    /**
+     * Convert backend API result to library result object to return in
+     * {@link Client.transfer} method and {@link toTransfers} function
+     *
+     * @param input - Backend API result
+     *
+     * @returns Converted result
+     */
+    var toTransfer = function (input) {
+        var transfer = {
+            id: input.transfer_id || 0,
+            userId: input.user_id || 0,
+            asset: input.asset || '',
+            amount: input.amount || '0',
+            status: input.status || TransferStatus.Unknown,
+            completedAt: new Date(input.completed_at),
+        };
+        if (input.spend_id !== undefined)
+            transfer.spendId = input.spend_id;
+        if (input.comment !== undefined)
+            transfer.comment = input.comment;
+        return transfer;
+    };
+    /**
+     * Convert backend API result to library result object to return in
+     * {@link Client.getInvoices} and {@link Client.getInvoicesPaginate}
+     * methods
+     *
+     * @param input - Backend API result
+     *
+     * @returns Converted result
+     */
+    var toInvoices = function (input) {
+        var items = [];
+        if (Array.isArray(input.items))
+            items = input.items.map(toInvoice);
+        return items;
+    };
+    /**
+     * Convert backend API result to library result object to return in
+     * {@link Client.getChecks} and {@link Client.getChecksPaginate}
+     * methods
+     *
+     * @param input - Backend API result
+     *
+     * @returns Converted result
+     */
+    var toChecks = function (input) {
+        var items = [];
+        if (Array.isArray(input.items))
+            items = input.items.map(toCheck);
+        return items;
+    };
+    /**
+     * Convert backend API result to library result object to return in
+     * {@link Client.getTransfers} and {@link Client.getTransfersPaginate}
+     * methods
+     *
+     * @param input - Backend API result
+     *
+     * @returns Converted result
+     */
+    var toTransfers = function (input) {
+        var items = [];
+        if (Array.isArray(input.items))
+            items = input.items.map(toTransfer);
+        return items;
+    };
+    /**
+     * Convert backend API result to library result object to return in
+     * {@link Client.getStats} method
+     *
+     * @param input - Backend API result
+     *
+     * @returns Converted result
+     */
+    var toStats = function (input) { return ({
+        volume: input.volume || '0',
+        conversion: input.conversion || '0',
+        uniqueUsersCount: input.unique_users_count || 0,
+        createdInvoiceCount: input.created_invoice_count || 0,
+        paidInvoiceCount: input.paid_invoice_count || 0,
+        startAt: new Date(input.start_at ? input.start_at : 0),
+        endAt: new Date(input.end_at ? input.end_at : 0),
+    }); };
+    /**
+     * Convert backend API result to library result object to return in
+     * {@link Store.getMe} method
+     *
+     * @param input - Backend API result
+     *
+     * @returns Converted result
+     */
+    var toMe = function (input) { return ({
+        id: input.app_id || 0,
+        name: input.name || '',
+        bot: input.payment_processing_bot_username || '',
+    }); };
+
     /**
      * Return exchange rate to passed currencies pair
      *
      * @param source - Source currency code
      * @param target - Target currency code
      * @param exchangeRates - Exchange rates information from {@link Store.getExchangeRates} method
-     * @param currencies - Currencies information from {@link Store.getCurrencies} method
      *
      * @returns Exchange rate or zero, if currencies pair not exists
      */
-    var getExchageRate = function (source, target, exchangeRates, currencies) {
-        var _a;
-        var rate = NaN;
+    var getExchageRate = function (source, target, exchangeRates) {
+        var rate = '';
         for (var i = 0, l = exchangeRates.length; i < l; i += 1) {
             var exchangeRate = exchangeRates[i];
             // If source and target correspond to direction in Store.getExchangeRates method result
             if (exchangeRate.source === source && exchangeRate.target === target) {
-                rate = exchangeRate.rate;
-                break;
-            }
-            // If source and target reverse to direction in Store.getExchangeRates method result
-            if (exchangeRate.source === target && exchangeRate.target === source) {
-                rate = 1 / exchangeRate.rate;
+                if (exchangeRate.isValid)
+                    rate = exchangeRate.rate;
                 break;
             }
         }
-        // eslint-disable-next-line no-restricted-globals
-        if (isNaN(rate))
-            return 0;
-        var numberOfNanosSigns = ((_a = currencies[target]) === null || _a === void 0 ? void 0 : _a.decimals) || 8;
-        return parseFloat(rate.toFixed(numberOfNanosSigns));
+        if (rate === '')
+            return '0';
+        return rate;
     };
     /**
      * Url check reguar expression
@@ -77,37 +382,81 @@ var CryptoBotAPI = (function () {
      */
     var isValidUrl = function (input) { return URL_CHECK_REGEXP.test(input); };
     /**
-     * Convert nanos string value to the form of string of whole coins
+     * Convert {@link GetStatsOptions} object to using backend API method
+     * parameters {@link GetStatsBackendOptions} object
      *
-     * @remarks
-     * Currencies need to know how many characters after decimal point are used by currency
+     * @param options - Library {@link Client.getStats} method options object
      *
-     * @param value - Value in nanos
-     * @param currencyCode - Currency code
-     * @param currencies - Currencies information from {@link Store.getCurrencies} method
+     * @throws Error - If options object invalid
      *
-     * @returns Representation of amount in coins
+     * @returns Object with corresponding backend API method parameters
      */
-    var nonosToCoins = function (value, currencyCode, currencies) {
-        var _a;
-        var result = value;
-        // Use default value as `8` if decimals property is lost
-        var numberOfNanosSigns = ((_a = currencies[currencyCode]) === null || _a === void 0 ? void 0 : _a.decimals) || 8;
-        var zerosNeed = numberOfNanosSigns - result.length;
-        if (zerosNeed > 0) {
-            var zeros = '';
-            for (var i = 0; i < zerosNeed; i += 1)
-                zeros += '0';
-            result = zeros + result;
+    var prepareGetStatsOptions = function (options) {
+        var prepared = {};
+        if (options.startAt === undefined && options.endAt === undefined)
+            return prepared;
+        if (options.startAt === undefined || !(options.startAt instanceof Date)) {
+            throw new Error('Field `startAt` must be a Date');
         }
-        if (result.length === numberOfNanosSigns)
-            result = "0.".concat(result);
-        else {
-            var pointPosition = result.length - numberOfNanosSigns;
-            result = "".concat(result.substr(0, pointPosition), ".").concat(result.substr(pointPosition));
+        if (options.endAt === undefined || !(options.endAt instanceof Date)) {
+            throw new Error('Field `endAt` must be a Date');
         }
-        // Remove trailing zeros
-        return result.replace(/0+$/, '');
+        prepared.start_at = options.startAt.toISOString();
+        prepared.end_at = options.endAt.toISOString();
+        return prepared;
+    };
+    /**
+     * Convert {@link CreateCheckOptions} object to using backend API method
+     * parameters {@link CreateCheckBackendOptions} object
+     *
+     * @param options - Library {@link Client.createCheck} method options object
+     *
+     * @throws Error - If options object invalid
+     *
+     * @returns Object with corresponding backend API method parameters
+     */
+    var prepareTransferOptions = function (options) {
+        if (options.comment !== undefined && options.comment.length > 1024) {
+            throw new Error('Comment can\'t be longer than 1024 characters');
+        }
+        // Create object with required parameters
+        var prepared = {
+            user_id: options.userId,
+            spend_id: options.spendId,
+            asset: options.asset,
+            amount: typeof options.amount === 'number' ? '' + options.amount : options.amount,
+        };
+        if (options.disableSendNotification !== undefined) {
+            prepared.disable_send_notification = options.disableSendNotification;
+        }
+        if (options.comment !== undefined)
+            prepared.comment = options.comment;
+        return prepared;
+    };
+    /**
+     * Convert {@link CreateCheckOptions} object to using backend API method
+     * parameters {@link CreateCheckBackendOptions} object
+     *
+     * @param options - Library {@link Client.createCheck} method options object
+     *
+     * @throws Error - If options object invalid
+     *
+     * @returns Object with corresponding backend API method parameters
+     */
+    var prepareCreateCheckOptions = function (options) {
+        // Create object with required parameters
+        var prepared = {
+            asset: options.asset,
+            amount: typeof options.amount === 'number' ? '' + options.amount : options.amount,
+        };
+        if (options.pinToUserId !== undefined)
+            prepared.pin_to_user_id = options.pinToUserId;
+        if (options.pinToUsername !== undefined)
+            prepared.pin_to_username = options.pinToUsername;
+        if (options.pinToUserId !== undefined && options.pinToUsername !== undefined) {
+            throw new Error('Pass only one of `pinToUserId` and `pinToUsername`');
+        }
+        return prepared;
     };
     /**
      * Convert {@link CreateInvoiceOptions} object to using backend API method
@@ -121,11 +470,20 @@ var CryptoBotAPI = (function () {
      */
     var prepareCreateInvoiceOptions = function (options) {
         // Check is options object valid
-        if (options.description && options.description.length > 1024) {
+        if (options.description !== undefined && options.description.length > 1024) {
             throw new Error('Description can\'t be longer than 1024 characters');
         }
-        if (options.paidBtnName && !options.paidBtnUrl) {
+        if (options.paidBtnName !== undefined && !options.paidBtnUrl) {
             throw new Error('Require paidBtnUrl parameter if paidBtnName parameter pass');
+        }
+        if (options.hiddenMessage !== undefined && options.hiddenMessage.length > 2048) {
+            throw new Error('Hidden message can\'t be longer than 2048 characters');
+        }
+        if (options.expiresIn !== undefined
+            && (typeof options.expiresIn !== 'number'
+                || options.expiresIn < 1
+                || options.expiresIn > 2678400)) {
+            throw new Error('Expires must be a number between 1-2678400');
         }
         var payload;
         if (options.payload !== undefined) {
@@ -139,12 +497,35 @@ var CryptoBotAPI = (function () {
         }
         // Create object with required parameters
         var prepared = {
-            asset: options.currency,
-            amount: +options.amount,
+            amount: typeof options.amount === 'number' ? '' + options.amount : options.amount,
         };
+        var currencyType = options.currencyType || CurrencyType.Crypto;
+        prepared.currency_type = currencyType;
+        if (currencyType === CurrencyType.Crypto) {
+            var asset = options.asset;
+            if (!asset)
+                throw new Error('Field `asset` required for crypto currency type');
+            prepared.asset = asset;
+        }
+        if (currencyType === CurrencyType.Fiat) {
+            var fiat = options.fiat;
+            if (!fiat)
+                throw new Error('Field `fiat` required for fiat currency type');
+            prepared.fiat = fiat;
+            if (options.acceptedAssets !== undefined) {
+                if (!Array.isArray(options.acceptedAssets)) {
+                    throw new Error('Field `acceptedAssets` must be array');
+                }
+                prepared.accepted_assets = options.acceptedAssets.join(',');
+            }
+        }
         // Same names
+        if (options.expiresIn !== undefined)
+            prepared.expires_in = options.expiresIn;
         if (options.description !== undefined)
             prepared.description = options.description;
+        if (options.hiddenMessage !== undefined)
+            prepared.hidden_message = options.hiddenMessage;
         if (payload !== undefined)
             prepared.payload = payload;
         // Different names
@@ -157,6 +538,21 @@ var CryptoBotAPI = (function () {
         if (options.isAllowAnonymous !== undefined)
             prepared.allow_anonymous = options.isAllowAnonymous;
         return prepared;
+    };
+    /**
+     * Convert identifier to using backend API delete methods
+     *
+     * @param id - Passed identifier
+     *
+     * @throws Error - If options identifier invalid
+     *
+     * @returns Identifier number
+     */
+    var prepareDeleteOptions = function (id) {
+        if (typeof id !== 'number' || isNaN(id) || id < 1) {
+            throw new Error('Identifier must be a valid positive number');
+        }
+        return id;
     };
     /**
      * Convert {@link GetInvoicesOptions} object to using backend API method
@@ -177,18 +573,19 @@ var CryptoBotAPI = (function () {
         if (options.count !== undefined)
             prepared.count = options.count;
         // Different names
-        if (options.currency !== undefined)
-            prepared.asset = options.currency;
-        if (options.ids !== undefined) {
-            prepared.invoice_ids = options.ids.map(function (value) { return +value; });
-        }
+        if (options.asset !== undefined)
+            prepared.asset = options.asset;
+        if (options.fiat !== undefined)
+            prepared.fiat = options.fiat;
+        if (options.ids !== undefined)
+            prepared.invoice_ids = options.ids.join(',');
         return prepared;
     };
     /**
      * Convert {@link GetInvoicesPaginateOptions} object to using backend API method
      * parameters {@link GetInvoicesBackendOptions} object
      *
-     * @param options - Library {@link Client.getInvoices} method options object
+     * @param options - Library {@link Client.getInvoicesPaginate} method options object
      *
      * @returns Object with corresponding backend API method parameters
      */
@@ -199,11 +596,12 @@ var CryptoBotAPI = (function () {
         if (options.status !== undefined)
             prepared.status = options.status;
         // Different names
-        if (options.currency !== undefined)
-            prepared.asset = options.currency;
-        if (options.ids !== undefined) {
-            prepared.invoice_ids = options.ids.map(function (value) { return +value; });
-        }
+        if (options.asset !== undefined)
+            prepared.asset = options.asset;
+        if (options.fiat !== undefined)
+            prepared.fiat = options.fiat;
+        if (options.ids !== undefined)
+            prepared.invoice_ids = options.ids.join(',');
         // Paginate options
         var page = options.page ? +options.page : 1;
         if (page < 1)
@@ -212,172 +610,109 @@ var CryptoBotAPI = (function () {
         prepared.offset = pageSize * (page - 1);
         return prepared;
     };
-
     /**
-     * Convert backend API result to library result object to return in
-     * {@link Client.getBalances} method
+     * Convert {@link GetChecksOptions} object to using backend API method
+     * parameters {@link GetChecksBackendOptions} object
      *
-     * @param input - Backend API result
-     * @param currencies - Currencies information from {@link Store.getCurrencies} method,
-     *                     need to correct format output in coins by currencies decimals counts
-     * @param isReturnInNanos - If true, return raw balances in nanos,
-     *                          else return converted to coins balances
+     * @param options - Library {@link Client.getChecks} method options object
      *
-     * @returns Converted result
+     * @returns Object with corresponding backend API method parameters
      */
-    var toBalances = function (input, currencies, isReturnInNanos) {
-        if (!Array.isArray(input))
-            return {};
-        // Conver array to HashMap structure
-        return input.reduce(function (accumulator, value) {
-            if (value.currency_code && value.available) {
-                accumulator[value.currency_code] = isReturnInNanos ? value.available : nonosToCoins(value.available, value.currency_code, currencies);
-            }
-            return accumulator;
-        }, {});
+    var prepareGetChecksOptions = function (options) {
+        // Create empty object, method doesn't have required parameters
+        var prepared = {};
+        // Same names
+        if (options.status !== undefined)
+            prepared.status = options.status;
+        if (options.offset !== undefined)
+            prepared.offset = options.offset;
+        if (options.count !== undefined)
+            prepared.count = options.count;
+        // Different names
+        if (options.asset !== undefined)
+            prepared.asset = options.asset;
+        if (options.ids !== undefined)
+            prepared.check_ids = options.ids.join(',');
+        return prepared;
     };
     /**
-     * Convert backend API result to library result object to return in
-     * {@link Store.getCurrencies} method
+     * Convert {@link GetChecksPaginateOptions} object to using backend API method
+     * parameters {@link GetChecksBackendOptions} object
      *
-     * @param input - Backend API result
+     * @param options - Library {@link Client.getChecksPaginate} method options object
      *
-     * @returns Converted result
+     * @returns Object with corresponding backend API method parameters
      */
-    var toCurrencies = function (input) {
-        if (!Array.isArray(input))
-            return {};
-        return input.reduce(function (accumulator, value) {
-            if (value.code) {
-                var code = value.code.toString();
-                var type = void 0;
-                if (value.is_blockchain)
-                    type = 'blockchain';
-                if (value.is_fiat)
-                    type = 'fiat';
-                if (value.is_stablecoin)
-                    type = 'stablecoin';
-                var currency = {
-                    name: value.name || '',
-                    decimals: value.decimals || 0,
-                    type: type,
-                };
-                accumulator[code] = currency;
-            }
-            return accumulator;
-        }, {});
+    var prepareGetChecksPaginateOptions = function (pageSize, options) {
+        // Create empty object, method doesn't have required parameters
+        var prepared = {};
+        // Same names
+        if (options.status !== undefined)
+            prepared.status = options.status;
+        // Different names
+        if (options.asset !== undefined)
+            prepared.asset = options.asset;
+        if (options.ids !== undefined)
+            prepared.check_ids = options.ids.join(',');
+        // Paginate options
+        var page = options.page ? +options.page : 1;
+        if (page < 1)
+            page = 1;
+        prepared.count = pageSize;
+        prepared.offset = pageSize * (page - 1);
+        return prepared;
     };
     /**
-     * Convert backend API result to library result object to return in
-     * {@link Store.getExchangeRates} method result
+     * Convert {@link GetTransfersOptions} object to using backend API method
+     * parameters {@link GetTransfersBackendOptions} object
      *
-     * @param input - Backend API result
+     * @param options - Library {@link Client.getTransfers} method options object
      *
-     * @returns Converted result
+     * @returns Object with corresponding backend API method parameters
      */
-    var toExchangeRates = function (input) {
-        if (!Array.isArray(input))
-            return [];
-        return input.map(function (value) { return ({
-            source: value.source || '',
-            target: value.target || '',
-            rate: parseFloat(value.rate),
-        }); });
+    var prepareGetTransfersOptions = function (options) {
+        // Create empty object, method doesn't have required parameters
+        var prepared = {};
+        // Same names
+        if (options.offset !== undefined)
+            prepared.offset = options.offset;
+        if (options.count !== undefined)
+            prepared.count = options.count;
+        // Different names
+        if (options.asset !== undefined)
+            prepared.asset = options.asset;
+        if (options.spendId !== undefined)
+            prepared.spend_id = options.spendId;
+        if (options.ids !== undefined)
+            prepared.transfer_ids = options.ids.join(',');
+        return prepared;
     };
     /**
-     * Convert backend API result to library result object to return in
-     * {@link Client.createInvoice} method, {@link toInvoices} function
-     * and {@link ClientEmitter} `paid` event emit
+     * Convert {@link GetTransfersPaginateOptions} object to using backend API method
+     * parameters {@link GetTransfersBackendOptions} object
      *
-     * @param input - Backend API result
+     * @param options - Library {@link Client.getTransfersPaginate} method options object
      *
-     * @returns Converted result
+     * @returns Object with corresponding backend API method parameters
      */
-    var toInvoice = function (input) {
-        var invoice = {
-            id: input.invoice_id || 0,
-            status: input.status || '',
-            hash: input.hash || '',
-            currency: input.asset || '',
-            amount: parseFloat(input.amount) || 0,
-            payUrl: input.pay_url || '',
-            isAllowComments: input.allow_comments || false,
-            isAllowAnonymous: input.allow_anonymous || false,
-            createdAt: new Date(input.created_at),
-        };
-        if (input.paid_anonymously !== undefined)
-            invoice.isPaidAnonymously = input.paid_anonymously;
-        if (input.paid_at !== undefined)
-            invoice.paidAt = new Date(input.paid_at);
-        if (input.description !== undefined)
-            invoice.description = input.description;
-        if (input.paid_btn_name !== undefined)
-            invoice.paidBtnName = input.paid_btn_name;
-        if (input.paid_btn_url !== undefined)
-            invoice.paidBtnUrl = input.paid_btn_url;
-        if (input.comment !== undefined)
-            invoice.comment = input.comment;
-        if (input.payload !== undefined) {
-            var payload = void 0;
-            try {
-                payload = JSON.parse(input.payload);
-            }
-            catch (err) {
-                payload = input.payload;
-            }
-            invoice.payload = payload;
-        }
-        return invoice;
+    var prepareGetTransfersPaginateOptions = function (pageSize, options) {
+        // Create empty object, method doesn't have required parameters
+        var prepared = {};
+        // Different names
+        if (options.asset !== undefined)
+            prepared.asset = options.asset;
+        if (options.spendId !== undefined)
+            prepared.spend_id = options.spendId;
+        if (options.ids !== undefined)
+            prepared.transfer_ids = options.ids.join(',');
+        // Paginate options
+        var page = options.page ? +options.page : 1;
+        if (page < 1)
+            page = 1;
+        prepared.count = pageSize;
+        prepared.offset = pageSize * (page - 1);
+        return prepared;
     };
-    /**
-     * Convert backend API result to library result object to return in
-     * {@link Client.getInvoices} and {@link Client.getInvoicesPaginate}
-     * methods
-     *
-     * @param input - Backend API result
-     *
-     * @returns Converted result
-     */
-    var toInvoices = function (input) {
-        var items = [];
-        if (Array.isArray(input.items))
-            items = input.items.map(toInvoice);
-        return {
-            count: input.count || 0,
-            items: items,
-        };
-    };
-    /**
-     * Convert backend API result to library result object to return in
-     * {@link Client.getInvoicesPaginate} method
-     *
-     * @param input - Backend API result
-     *
-     * @returns Converted result
-     */
-    var toInvoicesPaginated = function (page, pageSize, input) {
-        var items = [];
-        if (Array.isArray(input.items))
-            items = input.items.map(toInvoice);
-        return {
-            page: page,
-            pagesCount: Math.ceil((input.count || 0) / pageSize),
-            items: items,
-        };
-    };
-    /**
-     * Convert backend API result to library result object to return in
-     * {@link Store.getMe} method
-     *
-     * @param input - Backend API result
-     *
-     * @returns Converted result
-     */
-    var toMe = function (input) { return ({
-        id: input.app_id || 0,
-        name: input.name || '',
-        bot: input.payment_processing_bot_username || '',
-    }); };
 
     /**
      * Make HTTP GET request
@@ -468,7 +803,7 @@ var CryptoBotAPI = (function () {
                 try {
                     response = JSON.parse(rawResponse);
                 }
-                catch (err) {
+                catch (_a) {
                     throw new Error("Response parse error, raw reponse:\n".concat(rawResponse));
                 }
                 if (response.ok !== true) {
@@ -535,6 +870,7 @@ var CryptoBotAPI = (function () {
             return promise;
         };
     };
+    // Because `tsdoc` not support `@category` tag, but `typedoc` support
     /* eslint-disable tsdoc/syntax */
     /**
      * Wrapper for API methods that return possible cached data
@@ -617,6 +953,7 @@ var CryptoBotAPI = (function () {
         return Store;
     }());
 
+    // Because `tsdoc` not support `@category` tag, but `typedoc` support
     /* eslint-disable tsdoc/syntax */
     /**
      * Main class for work with API for browsers
@@ -643,7 +980,7 @@ var CryptoBotAPI = (function () {
         /**
          * Set count invoices per page for {@link Client.getInvoicesPaginate} method
          *
-         * @param pageSize - Invoices per page
+         * @param pageSizeParam - Invoices per page
          *
          * @throws Error - If `pageSize` parameter is invalid
          */
@@ -655,28 +992,69 @@ var CryptoBotAPI = (function () {
             this._pageSize = pageSize;
         };
         /**
+         * Get associated with passed API key app statistics
+         *
+         * Use {@link toStats} backend API result convert function
+         *
+         * @param options - New receive statistics options
+         *
+         * @throws Error - If there is an error sending request to backend API or parsing response
+         *
+         * @returns Promise, what resolved to associated with passed API key app statistics object
+         */
+        Client.prototype.getStats = function (options) {
+            if (options === void 0) { options = {}; }
+            return this._transport.call('getStats', prepareGetStatsOptions(options))
+                .then(function (result) { return toStats(result); });
+        };
+        /**
          * Get API app balances infomation
          *
          * Use {@link toBalances} backend API result convert function
-         *
-         * Call {@link Store.getCurrencies} method to fetch exchange rates information
-         *
-         * @param isReturnInNanos - If true, return raw balances in nanos,
-         *                          else return converted to coins balances
-         * @param isForce - If true, return fresh data from backend API, not from cache
          *
          * @throws Error - If there is an error sending request to backend API or parsing response
          *
          * @returns Promise, what resolved to API app balances infomation object
          */
-        Client.prototype.getBalances = function (isReturnInNanos, isForce) {
-            if (isReturnInNanos === void 0) { isReturnInNanos = false; }
-            if (isForce === void 0) { isForce = false; }
-            return Promise.all([this.getCurrencies(isForce), this._transport.call('getBalance')])
-                // eslint-disable-next-line arrow-body-style
-                .then(function (_a) {
-                var currencies = _a[0], balancesResponse = _a[1];
-                return toBalances(balancesResponse, currencies, isReturnInNanos);
+        Client.prototype.getBalances = function () {
+            return this._transport.call('getBalance').then(function (result) { return toBalances(result); });
+        };
+        /**
+         * Get API app balances infomation
+         *
+         * Use {@link toBalances} backend API result convert function
+         *
+         * @throws Error - If there is an error sending request to backend API or parsing response
+         *
+         * @returns Promise, what resolved to API app available balances infomation object
+         */
+        Client.prototype.getBalancesAvailable = function () {
+            return this.getBalances()
+                .then(function (balances) {
+                return Object.entries(balances).reduce(function (accumulator, entry) {
+                    var code = entry[0], balance = entry[1];
+                    accumulator[code] = balance.available;
+                    return accumulator;
+                }, {});
+            });
+        };
+        /**
+         * Get API app balances infomation
+         *
+         * Use {@link toBalances} backend API result convert function
+         *
+         * @throws Error - If there is an error sending request to backend API or parsing response
+         *
+         * @returns Promise, what resolved to API app balances on hold infomation object
+         */
+        Client.prototype.getBalancesOnhold = function () {
+            return this.getBalances()
+                .then(function (balances) {
+                return Object.entries(balances).reduce(function (accumulator, entry) {
+                    var code = entry[0], balance = entry[1];
+                    accumulator[code] = balance.onhold;
+                    return accumulator;
+                }, {});
             });
         };
         /**
@@ -684,23 +1062,56 @@ var CryptoBotAPI = (function () {
          *
          * Call {@link Client.getBalances} method to fetch balances information
          *
-         * @param currencyCode - Currency code
-         * @param isReturnInNanos - If true, return raw balances in nanos,
-         *                          else return converted to coins balances
-         * @param isForce - If true, return fresh data from backend API, not from cache
+         * @param currencyCode - Crypto currency code
          *
          * @throws Error - If there is an error sending request to backend API or parsing response
          *
          * @returns Promise, what resolved to API app balance value for passed currency
          */
-        Client.prototype.getBalance = function (currencyCode, isReturnInNanos, isForce) {
-            if (isReturnInNanos === void 0) { isReturnInNanos = false; }
-            if (isForce === void 0) { isForce = false; }
-            return this.getBalances(isReturnInNanos, isForce)
+        Client.prototype.getBalance = function (currencyCode) {
+            return this.getBalances()
+                .then(function (balances) {
+                if (balances[currencyCode] === undefined)
+                    return { available: '0', onhold: '0' };
+                return balances[currencyCode];
+            });
+        };
+        /**
+         * Get API app balance value for passed currency
+         *
+         * Call {@link Client.getBalances} method to fetch balances information
+         *
+         * @param currencyCode - Crypto currency code
+         *
+         * @throws Error - If there is an error sending request to backend API or parsing response
+         *
+         * @returns Promise, what resolved to API app available balance value for passed currency
+         */
+        Client.prototype.getBalanceAvailable = function (currencyCode) {
+            return this.getBalances()
                 .then(function (balances) {
                 if (balances[currencyCode] === undefined)
                     return '0';
-                return balances[currencyCode];
+                return balances[currencyCode].available;
+            });
+        };
+        /**
+         * Get API app balance value for passed currency
+         *
+         * Call {@link Client.getBalances} method to fetch balances information
+         *
+         * @param currencyCode - Crypto currency code
+         *
+         * @throws Error - If there is an error sending request to backend API or parsing response
+         *
+         * @returns Promise, what resolved to API app balance on hold value for passed currency
+         */
+        Client.prototype.getBalanceOnhold = function (currencyCode) {
+            return this.getBalances()
+                .then(function (balances) {
+                if (balances[currencyCode] === undefined)
+                    return '0';
+                return balances[currencyCode].onhold;
             });
         };
         /**
@@ -742,12 +1153,27 @@ var CryptoBotAPI = (function () {
          */
         Client.prototype.getExchangeRate = function (source, target, isForce) {
             if (isForce === void 0) { isForce = false; }
-            return Promise.all([this.getCurrencies(isForce), this.getExchangeRates(isForce)])
-                // eslint-disable-next-line arrow-body-style
-                .then(function (_a) {
-                var currencies = _a[0], exchangeRates = _a[1];
-                return getExchageRate(source, target, exchangeRates, currencies);
+            return this.getExchangeRates(isForce)
+                .then(function (exchangeRates) {
+                return getExchageRate(source, target, exchangeRates);
             });
+        };
+        /**
+         * Transfer
+         *
+         * Use {@link toTransfer} backend API result convert function and
+         * prepare backend API parameters {@link prepareTransferOptions} function
+         *
+         * @param options - Transfer options
+         *
+         * @throws Error - If there is an error sending request to backend API, parsing response error
+         *                 or options object is invalid
+         *
+         * @returns Promise, what resolved to completed transfer information object
+         */
+        Client.prototype.transfer = function (options) {
+            return this._transport.call('transfer', prepareTransferOptions(options))
+                .then(function (result) { return toTransfer(result); });
         };
         /**
          * Create invoice
@@ -765,6 +1191,47 @@ var CryptoBotAPI = (function () {
         Client.prototype.createInvoice = function (options) {
             return this._transport.call('createInvoice', prepareCreateInvoiceOptions(options))
                 .then(function (result) { return toInvoice(result); });
+        };
+        /**
+         * Create check
+         *
+         * Use {@link toCheck} backend API result convert function and
+         * prepare backend API parameters {@link prepareCreateCheckOptions} function
+         *
+         * @param options - New check options
+         *
+         * @throws Error - If there is an error sending request to backend API, parsing response error
+         *                 or options object is invalid
+         *
+         * @returns Promise, what resolved to created check information object
+         */
+        Client.prototype.createCheck = function (options) {
+            return this._transport.call('createCheck', prepareCreateCheckOptions(options))
+                .then(function (result) { return toCheck(result); });
+        };
+        /**
+         * Delete invoice
+         *
+         * @param id - Invoice identifier
+         *
+         * @throws Error - If there is an error sending request to backend API or parsing response error
+         *
+         * @returns Promise, what resolved to boolean operation result status
+         */
+        Client.prototype.deleteInvoice = function (id) {
+            return this._transport.call('deleteInvoice', { invoice_id: prepareDeleteOptions(id) });
+        };
+        /**
+         * Delete check
+         *
+         * @param id - Check identifier
+         *
+         * @throws Error - If there is an error sending request to backend API or parsing response error
+         *
+         * @returns Promise, what resolved to boolean operation result status
+         */
+        Client.prototype.deleteCheck = function (id) {
+            return this._transport.call('deleteCheck', { check_id: prepareDeleteOptions(id) });
         };
         /**
          * Get invoices
@@ -790,7 +1257,7 @@ var CryptoBotAPI = (function () {
          *
          * See {@link Client.getPageSize} and {@link Client.setPageSize}
          *
-         * Use {@link toInvoicesPaginated} backend API result convert function and
+         * Use {@link toInvoices} backend API result convert function and
          * prepare backend API parameters {@link prepareGetInvoicesPaginateOptions} function
          *
          * @param options - Filters options
@@ -801,14 +1268,90 @@ var CryptoBotAPI = (function () {
          * @returns Promise, what resolved to invoices information object
          */
         Client.prototype.getInvoicesPaginate = function (options) {
-            var _this = this;
             if (options === void 0) { options = {}; }
             var prepared = prepareGetInvoicesPaginateOptions(this._pageSize, options);
             return this._transport.call('getInvoices', prepared)
-                // eslint-disable-next-line arrow-body-style
-                .then(function (result) {
-                return toInvoicesPaginated(options.page, _this._pageSize, result);
-            });
+                .then(function (result) { return toInvoices(result); });
+        };
+        /**
+         * Get checks
+         *
+         * Use {@link toChecks} backend API result convert function and
+         * prepare backend API parameters {@link prepareGetChecksOptions} function
+         *
+         * @param options - Filters options
+         *
+         * @throws Error - If there is an error sending request to backend API or parsing response
+         *
+         * @returns Promise, what resolved to checks information object
+         */
+        Client.prototype.getChecks = function (options) {
+            if (options === void 0) { options = {}; }
+            return this._transport.call('getChecks', prepareGetChecksOptions(options))
+                .then(function (result) { return toChecks(result); });
+        };
+        /**
+         * Get checks paginated
+         *
+         * Fetch checks with `page` options parameter, except `count` and `offset`
+         *
+         * See {@link Client.getPageSize} and {@link Client.setPageSize}
+         *
+         * Use {@link toChecks} backend API result convert function and
+         * prepare backend API parameters {@link prepareGetChecksPaginateOptions} function
+         *
+         * @param options - Filters options
+         *
+         * @throws Error - If there is an error sending request to backend API, parsing response error
+         *                 or options object is invalid
+         *
+         * @returns Promise, what resolved to checks information object
+         */
+        Client.prototype.getChecksPaginate = function (options) {
+            if (options === void 0) { options = {}; }
+            var prepared = prepareGetChecksPaginateOptions(this._pageSize, options);
+            return this._transport.call('getChecks', prepared)
+                .then(function (result) { return toChecks(result); });
+        };
+        /**
+         * Get transfers
+         *
+         * Use {@link toTransfers} backend API result convert function and
+         * prepare backend API parameters {@link prepareGetTransfersOptions} function
+         *
+         * @param options - Filters options
+         *
+         * @throws Error - If there is an error sending request to backend API or parsing response
+         *
+         * @returns Promise, what resolved to transfers information object
+         */
+        Client.prototype.getTransfers = function (options) {
+            if (options === void 0) { options = {}; }
+            return this._transport.call('getTransfers', prepareGetTransfersOptions(options))
+                .then(function (result) { return toTransfers(result); });
+        };
+        /**
+         * Get transfers paginated
+         *
+         * Fetch checks with `page` options parameter, except `count` and `offset`
+         *
+         * See {@link Client.getPageSize} and {@link Client.setPageSize}
+         *
+         * Use {@link toTransfers} backend API result convert function and
+         * prepare backend API parameters {@link prepareGetTransfersOptions} function
+         *
+         * @param options - Filters options
+         *
+         * @throws Error - If there is an error sending request to backend API, parsing response error
+         *                 or options object is invalid
+         *
+         * @returns Promise, what resolved to transfers information object
+         */
+        Client.prototype.getTransfersPaginate = function (options) {
+            if (options === void 0) { options = {}; }
+            var prepared = prepareGetTransfersPaginateOptions(this._pageSize, options);
+            return this._transport.call('getTransfers', prepared)
+                .then(function (result) { return toTransfers(result); });
         };
         /**
          * Call backend API method directly (types unsafe)
@@ -827,6 +1370,30 @@ var CryptoBotAPI = (function () {
             if (options === void 0) { options = {}; }
             return this._transport.call(method, options);
         };
+        /**
+         * Access to {@link CurrencyType} enumeration, used in {@link Invoice} type
+         */
+        Client.CurrencyType = CurrencyType;
+        /**
+       * Access to {@link DetailedCurrencyType} enumeration, used in {@link Store.getCurrencies}
+       * and {@link Client.getCurrency} methods results
+       */
+        Client.DetailedCurrencyType = DetailedCurrencyType;
+        /**
+         * Access to {@link InvoiceStatus} enumeration, used in {@link Invoice} type,
+         * {@link Client.getInvoices} and {@link Client.getInvoicesPaginate} methods options
+         */
+        Client.InvoiceStatus = InvoiceStatus;
+        /**
+         * Access to {@link CheckStatus} enumeration, used in {@link Check} type,
+         * {@link Client.getChecks} and {@link Client.getChecksPaginate} methods options
+         */
+        Client.CheckStatus = CheckStatus;
+        /**
+         * Access to {@link TransferStatus} enumeration, used in {@link Transfer} type,
+         * {@link Client.getTransfers} and {@link Client.getTransfersPaginate} methods options
+         */
+        Client.TransferStatus = TransferStatus;
         return Client;
     }(Store));
 

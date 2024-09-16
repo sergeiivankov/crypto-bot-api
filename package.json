@@ -1,6 +1,6 @@
 {
   "name": "crypto-bot-api",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "Simple and minimalistic client for Telegram CryptoBot Crypto Pay API",
   "author": "Sergei Ivankov <sergeiivankov@pm.me>",
   "license": "MIT",
@@ -34,14 +34,15 @@
     "@rollup/plugin-typescript": "^11.1.6",
     "@stylistic/eslint-plugin": "^2.8.0",
     "@types/eslint__js": "^8.42.3",
-    "@types/node": "^22.5.4",
+    "@types/node": "^22.5.5",
     "eslint": "^9.10.0",
     "eslint-plugin-tsdoc": "^0.3.0",
     "npm-run-all": "^4.1.5",
     "rollup": "^4.21.3",
     "tslib": "^2.7.0",
     "typedoc": "^0.26.7",
-    "typescript": "^5.6.2"
+    "typescript": "^5.6.2",
+    "typescript-eslint": "^8.5.0"
   },
   "keywords": [
     "crypto-bot-api",
@@ -57,8 +58,5 @@
     "ton",
     "the-open-network",
     "telegram-bot"
-  ],
-  "dependencies": {
-    "typescript-eslint": "^8.5.0"
-  }
+  ]
 }

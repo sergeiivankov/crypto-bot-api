@@ -51,7 +51,7 @@ In browsers:
 </script>
 ```
 
-**Important: at the time of publication of version 0.2.0 (Dec 9, 2021), API servers do not return header Access-Control-Allow-Origin, which allows make requests to API from third-party domains, so client request from website environment won't work (but its work in browser extensions, Electron and similar apps)**
+**Important: at the time of publication of version 0.3.0 (Sep 16, 2024), API servers do not return header Access-Control-Allow-Origin, which allows make requests to API from third-party domains, so client request from website environment won't work (but its work in browser extensions, Electron and similar apps)**
 
 More usage examples see in [examples](https://github.com/sergeiivankov/crypto-bot-api/tree/main/examples) project directory.
 
@@ -61,7 +61,7 @@ Crypto Pay API support events by sending webhooks requests. To handle webhooks r
 
 *Note: you need enable webhooks in CryptoBot app settings.*
 
-**Important: at the time of publication of version 0.2.0 (Dec 9, 2021), API servers do not accept self-signed certificates**
+**Important: at the time of publication of version 0.3.0 (Sep 16, 2024), API servers do not accept self-signed certificates**
 
 ## Documentation
 
