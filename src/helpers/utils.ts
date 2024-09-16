@@ -1,11 +1,11 @@
 import {
-  CurrencyType, CryptoCurrencyCode, FiatCurrencyCode, InvoiceStatus, ExchangeRates,
+  CurrencyType, CryptoCurrencyCode, FiatCurrencyCode, InvoiceStatus, CheckStatus, ExchangeRates,
 } from './casts';
 
 /** Possible backend API methods names */
 export type ApiMethod =
-  'getMe' | 'getStats' | 'createInvoice' | 'deleteInvoice' | 'deleteCheck' | 'getInvoices' |
-  'getBalance' | 'getExchangeRates' | 'getCurrencies';
+  'getMe' | 'getStats' | 'createInvoice' | 'createCheck' | 'deleteInvoice' | 'deleteCheck' |
+  'getInvoices' | 'getChecks' | 'getBalance' | 'getExchangeRates' | 'getCurrencies';
 
 /** Options object type for {@link Client.getStats} method */
 export type GetStatsOptions = {
@@ -21,6 +21,30 @@ export type GetStatsBackendOptions = {
   start_at?: string,
   /** The date on which to finish calculating statistics */
   end_at?: string,
+};
+
+/** Options object type for {@link Client.createCheck} method */
+export type CreateCheckOptions = {
+  /** Invoice asset */
+  asset: CryptoCurrencyCode,
+  /** Invoice amount */
+  amount: number | string,
+  /** ID of the user who will be able to activate the check */
+  pinToUserId?: number,
+  /** A user with the specified username will be able to activate the check */
+  pinToUsername?: string,
+};
+
+/** Backend options object type for {@link Client.createCheck} method */
+export type CreateCheckBackendOptions = {
+  /** Invoice asset */
+  asset: CryptoCurrencyCode,
+  /** Invoice amount */
+  amount: string,
+  /** ID of the user who will be able to activate the check */
+  pin_to_user_id?: number,
+  /** A user with the specified username will be able to activate the check */
+  pin_to_username?: string,
 };
 
 /** Options object type for {@link Client.createInvoice} method */
@@ -93,7 +117,7 @@ export type GetInvoicesOptions = {
   /** Invoices fiat currency filter */
   fiat?: FiatCurrencyCode,
   /** Invoices identifiers filter */
-  ids?: (number | string)[],
+  ids?: number[],
   /** Invoices status filter */
   status?: GetInvoicesStatus,
   /** Number of invoices to skip */
@@ -109,7 +133,7 @@ export type GetInvoicesPaginateOptions = {
   /** Invoices fiat currency filter */
   fiat?: FiatCurrencyCode,
   /** Invoices identifiers filter */
-  ids?: (number | string)[],
+  ids?: number[],
   /** Invoices status filter */
   status?: GetInvoicesStatus,
   /** Pagination page number */
@@ -123,12 +147,52 @@ export type GetInvoicesBackendOptions = {
   /** Invoices fiat currency filter */
   fiat?: FiatCurrencyCode,
   /** Invoices identifiers filter */
-  invoice_ids?: number[],
+  invoice_ids?: string,
   /** Invoices status filter */
   status?: GetInvoicesStatus,
   /** Number of invoices to skip */
   offset?: number,
   /** Number of invoices returned */
+  count?: number,
+};
+
+/** Options object type for {@link Client.getChecks} method */
+export type GetChecksOptions = {
+  /** Checks asset filter */
+  asset?: CryptoCurrencyCode,
+  /** Checks identifiers filter */
+  ids?: number[],
+  /** Checks status filter */
+  status?: GetChecksStatus,
+  /** Number of checks to skip */
+  offset?: number,
+  /** Number of checks returned */
+  count?: number,
+};
+
+/** Options object type for {@link Client.getChecksPaginate} method */
+export type GetChecksPaginateOptions = {
+  /** Checks asset filter */
+  asset?: CryptoCurrencyCode,
+  /** Checks identifiers filter */
+  ids?: number[],
+  /** Checks status filter */
+  status?: GetChecksStatus,
+  /** Pagination page number */
+  page?: number,
+};
+
+/** Backend options object type for {@link Client.getChecks} method */
+export type GetChecksBackendOptions = {
+  /** Checks asset filter */
+  asset?: CryptoCurrencyCode,
+  /** Checks identifiers filter */
+  check_ids?: string,
+  /** Checks status filter */
+  status?: GetChecksStatus,
+  /** Number of checks to skip */
+  offset?: number,
+  /** Number of checks returned */
   count?: number,
 };
 
@@ -138,6 +202,13 @@ export type GetInvoicesBackendOptions = {
  * - {@link InvoiceStatus.Paid} - Paid invoice
  */
 export type GetInvoicesStatus = InvoiceStatus.Active | InvoiceStatus.Paid;
+
+/**
+ * Possible checks statuses
+ * - {@link CheckStatus.Active} - Active check
+ * - {@link CheckStatus.Activated} - Activated check
+ */
+export type GetChecksStatus = CheckStatus.Active | CheckStatus.Activated;
 
 /**
  * Express.js-like API middleware handler
@@ -219,6 +290,25 @@ export const prepareGetStatsOptions = (options: GetStatsOptions): GetStatsBacken
 
   prepared.start_at = options.startAt.toISOString();
   prepared.end_at = options.endAt.toISOString();
+
+  return prepared;
+};
+
+export const prepareCreateCheckOptions = (
+  options: CreateCheckOptions,
+): CreateCheckBackendOptions => {
+  // Create object with required parameters
+  const prepared: CreateCheckBackendOptions = {
+    asset: options.asset,
+    amount: typeof options.amount === 'number' ? '' + options.amount : options.amount,
+  };
+
+  if (options.pinToUserId !== undefined) prepared.pin_to_user_id = options.pinToUserId;
+  if (options.pinToUsername !== undefined) prepared.pin_to_username = options.pinToUsername;
+
+  if (options.pinToUserId !== undefined && options.pinToUsername !== undefined) {
+    throw new Error('Pass only one of `pinToUserId` and `pinToUsername`');
+  }
 
   return prepared;
 };
@@ -345,9 +435,7 @@ export const prepareGetInvoicesOptions = (
   // Different names
   if (options.asset !== undefined) prepared.asset = options.asset;
   if (options.fiat !== undefined) prepared.fiat = options.fiat;
-  if (options.ids !== undefined) {
-    prepared.invoice_ids = options.ids.map((value: number | string): number => +value);
-  }
+  if (options.ids !== undefined) prepared.invoice_ids = options.ids.join(',');
 
   return prepared;
 };
@@ -372,9 +460,63 @@ export const prepareGetInvoicesPaginateOptions = (
   // Different names
   if (options.asset !== undefined) prepared.asset = options.asset;
   if (options.fiat !== undefined) prepared.fiat = options.fiat;
-  if (options.ids !== undefined) {
-    prepared.invoice_ids = options.ids.map((value: number | string): number => +value);
-  }
+  if (options.ids !== undefined) prepared.invoice_ids = options.ids.join(',');
+
+  // Paginate options
+  let page = options.page ? +options.page : 1;
+  if (page < 1) page = 1;
+  prepared.count = pageSize;
+  prepared.offset = pageSize * (page - 1);
+
+  return prepared;
+};
+
+/**
+ * Convert {@link GetChecksOptions} object to using backend API method
+ * parameters {@link GetChecksBackendOptions} object
+ *
+ * @param options - Library {@link Client.getChecks} method options object
+ *
+ * @returns Object with corresponding backend API method parameters
+ */
+export const prepareGetChecksOptions = (
+  options: GetChecksOptions,
+): GetChecksBackendOptions => {
+  // Create empty object, method doesn't have required parameters
+  const prepared: GetChecksBackendOptions = {};
+
+  // Same names
+  if (options.status !== undefined) prepared.status = options.status;
+  if (options.offset !== undefined) prepared.offset = options.offset;
+  if (options.count !== undefined) prepared.count = options.count;
+
+  // Different names
+  if (options.asset !== undefined) prepared.asset = options.asset;
+  if (options.ids !== undefined) prepared.check_ids = options.ids.join(',');
+
+  return prepared;
+};
+
+/**
+ * Convert {@link GetChecksPaginateOptions} object to using backend API method
+ * parameters {@link GetChecksBackendOptions} object
+ *
+ * @param options - Library {@link Client.getChecks} method options object
+ *
+ * @returns Object with corresponding backend API method parameters
+ */
+export const prepareGetChecksPaginateOptions = (
+  pageSize: number, options: GetChecksPaginateOptions,
+): GetChecksBackendOptions => {
+  // Create empty object, method doesn't have required parameters
+  const prepared: GetChecksBackendOptions = {};
+
+  // Same names
+  if (options.status !== undefined) prepared.status = options.status;
+
+  // Different names
+  if (options.asset !== undefined) prepared.asset = options.asset;
+  if (options.ids !== undefined) prepared.check_ids = options.ids.join(',');
 
   // Paginate options
   let page = options.page ? +options.page : 1;

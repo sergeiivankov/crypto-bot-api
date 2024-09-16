@@ -1,12 +1,14 @@
 import {
   Balances, Balance, BalancesType, Currency, CurrencyCode, CryptoCurrencyCode, CurrencyType,
-  Currencies, DetailedCurrencyType, ExchangeRates, Invoice, Stats,
-  InvoiceStatus, toBalances, toInvoice, toInvoices, toStats,
+  Currencies, DetailedCurrencyType, ExchangeRates, Invoice, Check, Stats,
+  InvoiceStatus, CheckStatus, toBalances, toInvoice, toCheck, toInvoices, toChecks, toStats,
 } from '../helpers/casts';
 import {
-  ApiMethod, CreateInvoiceOptions, GetInvoicesOptions, GetInvoicesPaginateOptions, GetStatsOptions,
-  getExchageRate, prepareCreateInvoiceOptions, prepareDeleteOptions, prepareGetInvoicesOptions,
-  prepareGetInvoicesPaginateOptions, prepareGetStatsOptions,
+  ApiMethod, CreateInvoiceOptions, CreateCheckOptions, GetChecksOptions, GetChecksPaginateOptions,
+  GetInvoicesOptions, GetInvoicesPaginateOptions, GetStatsOptions, getExchageRate,
+  prepareCreateInvoiceOptions, prepareDeleteOptions, prepareGetInvoicesOptions,
+  prepareGetInvoicesPaginateOptions, prepareGetStatsOptions, prepareCreateCheckOptions,
+  prepareGetChecksOptions, prepareGetChecksPaginateOptions,
 } from '../helpers/utils';
 import Store from './Store';
 
@@ -40,6 +42,12 @@ export default class Client extends Store {
    * {@link Client.getInvoices} and {@link Client.getInvoicesPaginate} methods options
    */
   public static InvoiceStatus: typeof InvoiceStatus = InvoiceStatus;
+
+  /**
+   * Access to {@link CheckStatus} enumeration, used in {@link Check} type,
+   * {@link Client.getChecks} and {@link Client.getChecksPaginate} methods options
+   */
+  public static CheckStatus: typeof CheckStatus = CheckStatus;
 
   /**
    * Return count invoices per page for {@link Client.getInvoicesPaginate} method
@@ -259,6 +267,24 @@ export default class Client extends Store {
   }
 
   /**
+   * Create check
+   *
+   * Use {@link toCheck} backend API result convert function and
+   * prepare backend API parameters {@link prepareCreateCheckOptions} function
+   *
+   * @param options - New check options
+   *
+   * @throws Error - If there is an error sending request to backend API, parsing response error
+   *                 or options object is invalid
+   *
+   * @returns Promise, what resolved to created check information object
+   */
+  createCheck(options: CreateCheckOptions): Promise<Check> {
+    return this._transport.call('createCheck', prepareCreateCheckOptions(options))
+      .then((result: any): Check => toCheck(result));
+  }
+
+  /**
    * Delete invoice
    *
    * @param id - Invoice identifier
@@ -308,7 +334,7 @@ export default class Client extends Store {
    *
    * See {@link Client.getPageSize} and {@link Client.setPageSize}
    *
-   * Use {@link toInvoicesPaginated} backend API result convert function and
+   * Use {@link toInvoices} backend API result convert function and
    * prepare backend API parameters {@link prepareGetInvoicesPaginateOptions} function
    *
    * @param options - Filters options
@@ -323,6 +349,47 @@ export default class Client extends Store {
 
     return this._transport.call('getInvoices', prepared)
       .then((result: any): Invoice[] => toInvoices(result));
+  }
+
+  /**
+   * Get checks
+   *
+   * Use {@link toChecks} backend API result convert function and
+   * prepare backend API parameters {@link prepareGetChecksOptions} function
+   *
+   * @param options - Filters options
+   *
+   * @throws Error - If there is an error sending request to backend API or parsing response
+   *
+   * @returns Promise, what resolved to checks information object
+   */
+  getChecks(options: GetChecksOptions = {}): Promise<Check[]> {
+    return this._transport.call('getChecks', prepareGetChecksOptions(options))
+      .then((result: any): Check[] => toChecks(result));
+  }
+
+  /**
+   * Get checks paginated
+   *
+   * Fetch checks with `page` options parameter, except `count` and `offset`
+   *
+   * See {@link Client.getPageSize} and {@link Client.setPageSize}
+   *
+   * Use {@link toChecks} backend API result convert function and
+   * prepare backend API parameters {@link prepareGetChecksPaginateOptions} function
+   *
+   * @param options - Filters options
+   *
+   * @throws Error - If there is an error sending request to backend API, parsing response error
+   *                 or options object is invalid
+   *
+   * @returns Promise, what resolved to checks information object
+   */
+  getChecksPaginate(options: GetChecksPaginateOptions = {}): Promise<Check[]> {
+    const prepared = prepareGetChecksPaginateOptions(this._pageSize, options);
+
+    return this._transport.call('getChecks', prepared)
+      .then((result: any): Check[] => toChecks(result));
   }
 
   /**

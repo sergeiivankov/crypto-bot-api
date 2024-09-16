@@ -51,6 +51,13 @@ export enum InvoiceStatus {
   Unknown = 'unknown',
 }
 
+/** Possible check statuses */
+export enum CheckStatus {
+  Active = 'active',
+  Activated = 'activated',
+  Unknown = 'unknown',
+}
+
 /**
  * Currency type object for {@link Store.getCurrencies}
  * and {@link Client.getCurrency} methods results
@@ -94,6 +101,41 @@ export type ExchangeRate = {
 export type ExchangeRates = ExchangeRate[];
 
 /**
+ * Check type object for {@link Client.getChecks}, {@link Client.getChecksPaginate}
+ * and {@link Client.createCheck} methods results
+ */
+export type Check = {
+  /** Check identifier */
+  id: number,
+  /** Check hash */
+  hash: string,
+  /** Check asset */
+  asset: CryptoCurrencyCode,
+  /** Check amount */
+  amount: string,
+  /** Check receive url for user by bot */
+  botCheckUrl: string,
+  /** Check status */
+  status: CheckStatus,
+  /** Check created date */
+  createdAt: Date,
+  /** Check activated date */
+  activatedAt?: Date,
+  /**
+   * ID of the user who will be able to activate the check,
+   * only if passed in check creation,
+   * if exists, field `pinToUsername` will be absent
+   */
+  pinToUserId?: number,
+  /**
+   * A user with the specified username will be able to activate the check,
+   * only if passed in check creation,
+   * if exists, field `pinToUserId` will be absent
+   */
+  pinToUsername?: string,
+};
+
+/**
  * Invoice type object for {@link Client.getInvoices}, {@link Client.getInvoicesPaginate},
  * {@link Client.createInvoice} methods results and {@link ClientEmitter} `paid` event emit
  */
@@ -109,7 +151,7 @@ export type Invoice = {
   /** Invoice currency code */
   currency: CurrencyCode,
   /** Invoice amount */
-  amount: number,
+  amount: string,
   /** Invoice pay url for user by bot */
   botPayUrl: string,
   /** Invoice pay url for user by mini app */
@@ -304,7 +346,7 @@ export const toInvoice = (input: any): Invoice => {
     hash: input.hash || '',
     currencyType: input.currency_type || '',
     currency: input.asset || input.fiat || '',
-    amount: parseFloat(input.amount) || 0,
+    amount: input.amount || '0',
     isAllowComments: input.allow_comments || false,
     isAllowAnonymous: input.allow_anonymous || false,
     createdAt: new Date(input.created_at),
@@ -352,6 +394,38 @@ export const toInvoice = (input: any): Invoice => {
 
 /**
  * Convert backend API result to library result object to return in
+ * {@link Client.createCheck} method and {@link toChecks} function
+ *
+ * @param input - Backend API result
+ *
+ * @returns Converted result
+ */
+export const toCheck = (input: any): Check => {
+  const check: Check = {
+    id: input.check_id || 0,
+    hash: input.hash || '',
+    asset: input.asset || '',
+    amount: input.amount || '0',
+    botCheckUrl: input.bot_check_url || '',
+    status: input.status || CheckStatus.Unknown,
+    createdAt: new Date(input.created_at),
+  };
+
+  if (input.activated_at !== undefined) check.activatedAt = new Date(input.activated_at);
+  if (input.pin_to_user !== undefined && input.pin_to_user.pin_by !== undefined) {
+    if (input.pin_to_user.pin_by === 'id' && input.pin_to_user.user_id !== undefined) {
+      check.pinToUserId = input.pin_to_user.user_id;
+    }
+    if (input.pin_to_user.pin_by === 'username' && input.pin_to_user.username !== undefined) {
+      check.pinToUsername = input.pin_to_user.username;
+    }
+  }
+
+  return check;
+};
+
+/**
+ * Convert backend API result to library result object to return in
  * {@link Client.getInvoices} and {@link Client.getInvoicesPaginate}
  * methods
  *
@@ -363,6 +437,23 @@ export const toInvoices = (input: any): Invoice[] => {
   let items: Invoice[] = [];
 
   if (Array.isArray(input.items)) items = input.items.map(toInvoice);
+
+  return items;
+};
+
+/**
+ * Convert backend API result to library result object to return in
+ * {@link Client.getChecks} and {@link Client.getChecksPaginate}
+ * methods
+ *
+ * @param input - Backend API result
+ *
+ * @returns Converted result
+ */
+export const toChecks = (input: any): Check[] => {
+  let items: Check[] = [];
+
+  if (Array.isArray(input.items)) items = input.items.map(toCheck);
 
   return items;
 };
