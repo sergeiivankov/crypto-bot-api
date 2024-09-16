@@ -4,8 +4,24 @@ import {
 
 /** Possible backend API methods names */
 export type ApiMethod =
-  'getMe' | 'createInvoice' | 'deleteInvoice' | 'deleteCheck' | 'getInvoices' | 'getBalance' |
-  'getExchangeRates' | 'getCurrencies';
+  'getMe' | 'getStats' | 'createInvoice' | 'deleteInvoice' | 'deleteCheck' | 'getInvoices' |
+  'getBalance' | 'getExchangeRates' | 'getCurrencies';
+
+/** Options object type for {@link Client.getStats} method */
+export type GetStatsOptions = {
+  /** Date from which start calculating statistics */
+  startAt?: Date,
+  /** The date on which to finish calculating statistics */
+  endAt?: Date,
+};
+
+/** Backend options object type for {@link Client.getStats} method */
+export type GetStatsBackendOptions = {
+  /** Date from which start calculating statistics */
+  start_at?: string,
+  /** The date on which to finish calculating statistics */
+  end_at?: string,
+};
 
 /** Options object type for {@link Client.createInvoice} method */
 export type CreateInvoiceOptions = {
@@ -178,6 +194,34 @@ const URL_CHECK_REGEXP = /^https?:\/\/((([a-z\d][a-z\d-]*[a-z\d])\.)+[a-z]{2,}|(
  * @returns Check result
  */
 export const isValidUrl = (input: string): boolean => URL_CHECK_REGEXP.test(input);
+
+/**
+ * Convert {@link GetStatsOptions} object to using backend API method
+ * parameters {@link GetStatsBackendOptions} object
+ *
+ * @param options - Library {@link Client.getStats} method options object
+ *
+ * @throws Error - If options object invalid
+ *
+ * @returns Object with corresponding backend API method parameters
+ */
+export const prepareGetStatsOptions = (options: GetStatsOptions): GetStatsBackendOptions => {
+  const prepared: GetStatsBackendOptions = {};
+
+  if (options.startAt === undefined && options.endAt === undefined) return prepared;
+
+  if (options.startAt === undefined || !(options.startAt instanceof Date)) {
+    throw new Error('Field `startAt` must be a Date');
+  }
+  if (options.endAt === undefined || !(options.endAt instanceof Date)) {
+    throw new Error('Field `endAt` must be a Date');
+  }
+
+  prepared.start_at = options.startAt.toISOString();
+  prepared.end_at = options.endAt.toISOString();
+
+  return prepared;
+};
 
 /**
  * Convert {@link CreateInvoiceOptions} object to using backend API method

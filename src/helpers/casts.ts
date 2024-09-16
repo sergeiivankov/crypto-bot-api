@@ -186,7 +186,25 @@ export type Invoice = {
   paidFiatRate?: number,
 };
 
-/** Result type object for {@link Client.getMe} method */
+/** Result type object for {@link Store.getStats} method */
+export type Stats = {
+  /** Total volume of paid invoices in USD */
+  volume: string,
+  /** Conversion of all created invoices */
+  conversion: string,
+  /** The unique number of users who have paid the invoice */
+  uniqueUsersCount: number,
+  /** Total created invoice count */
+  createdInvoiceCount: number,
+  /** Total paid invoice count */
+  paidInvoiceCount: number,
+  /** The date on which the statistics calculation was started */
+  startAt: Date,
+  /** The date on which the statistics calculation was ended */
+  endAt: Date,
+};
+
+/** Result type object for {@link Store.getMe} method */
 export type Me = {
   /** App identifier */
   id: number,
@@ -348,6 +366,24 @@ export const toInvoices = (input: any): Invoice[] => {
 
   return items;
 };
+
+/**
+ * Convert backend API result to library result object to return in
+ * {@link Store.getStats} method
+ *
+ * @param input - Backend API result
+ *
+ * @returns Converted result
+ */
+export const toStats = (input: any): Stats => ({
+  volume: input.volume || '0',
+  conversion: input.conversion || '0',
+  uniqueUsersCount: input.unique_users_count || 0,
+  createdInvoiceCount: input.created_invoice_count || 0,
+  paidInvoiceCount: input.paid_invoice_count || 0,
+  startAt: new Date(input.start_at ? input.start_at : 0),
+  endAt: new Date(input.end_at ? input.end_at : 0),
+});
 
 /**
  * Convert backend API result to library result object to return in

@@ -2,11 +2,11 @@
 
 ## Unreleased changes
 
+- Add `getStats`, `deleteInvoice` and `deleteCheck` methods
 - Change methods `getInvoices` and `getInvoicesPaginate` to returns array of `Invoice`
 - Remove `currency` field from `GetInvoicesOptions` and `GetInvoicesPaginateOptions` types and add `asset` and `fiat` fields
 - Update `Invoice` type to actual API version
 - Update `createInvoice` method to actual API version, change related options types
-- Add `deleteInvoice` and `deleteCheck` methods
 - Change return type of `getExchangeRate` method and field `rate` of `ExchangeRate` type which returned by `getExchangeRates` method to string
 - Remove calculating and returning exchange rate for reverse pair of `source` and `target` by `getExchangeRate` method
 - Add `isValid` field to `ExchangeRate` type

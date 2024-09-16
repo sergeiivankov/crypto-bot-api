@@ -1,12 +1,12 @@
 import {
   Balances, Balance, BalancesType, Currency, CurrencyCode, CryptoCurrencyCode, CurrencyType,
-  Currencies, DetailedCurrencyType, ExchangeRates, Invoice,
-  InvoiceStatus, toBalances, toInvoice, toInvoices,
+  Currencies, DetailedCurrencyType, ExchangeRates, Invoice, Stats,
+  InvoiceStatus, toBalances, toInvoice, toInvoices, toStats,
 } from '../helpers/casts';
 import {
-  ApiMethod, CreateInvoiceOptions, GetInvoicesOptions, GetInvoicesPaginateOptions,
+  ApiMethod, CreateInvoiceOptions, GetInvoicesOptions, GetInvoicesPaginateOptions, GetStatsOptions,
   getExchageRate, prepareCreateInvoiceOptions, prepareDeleteOptions, prepareGetInvoicesOptions,
-  prepareGetInvoicesPaginateOptions,
+  prepareGetInvoicesPaginateOptions, prepareGetStatsOptions,
 } from '../helpers/utils';
 import Store from './Store';
 
@@ -61,6 +61,22 @@ export default class Client extends Store {
       throw Error('Page size may be from 1 to 1000');
     }
     this._pageSize = pageSize;
+  }
+
+  /**
+   * Get associated with passed API key app statistics
+   *
+   * Use {@link toStats} backend API result convert function
+   *
+   * @param options - New receive statistics options
+   *
+   * @throws Error - If there is an error sending request to backend API or parsing response
+   *
+   * @returns Promise, what resolved to associated with passed API key app statistics object
+   */
+  getStats(options: GetStatsOptions = {}): Promise<Stats> {
+    return this._transport.call('getStats', prepareGetStatsOptions(options))
+      .then((result: any): Stats => toStats(result));
   }
 
   /**
