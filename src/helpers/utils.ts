@@ -155,7 +155,7 @@ export const getExchageRate = (
 
     // If source and target correspond to direction in Store.getExchangeRates method result
     if (exchangeRate.source === source && exchangeRate.target === target) {
-      rate = exchangeRate.rate;
+      if (exchangeRate.isValid) rate = exchangeRate.rate;
       break;
     }
   }

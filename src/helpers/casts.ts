@@ -86,6 +86,8 @@ export type ExchangeRate = {
   target: string,
   /** Source to target exchange rate */
   rate: string,
+  /** True, if the received rate is up-to-date */
+  isValid: boolean,
 };
 
 /** Result type for {@link Store.getExchangeRates} method */
@@ -264,6 +266,7 @@ export const toExchangeRates = (input: any): ExchangeRates => {
     source: value.source || '',
     target: value.target || '',
     rate: value.rate,
+    isValid: value.is_valid,
   }));
 };
 

@@ -9,6 +9,8 @@
 - Add `deleteInvoice` and `deleteCheck` methods
 - Change return type of `getExchangeRate` method and field `rate` of `ExchangeRate` type which returned by `getExchangeRates` method to string
 - Remove calculating and returning exchange rate for reverse pair of `source` and `target` by `getExchangeRate` method
+- Add `isValid` field to `ExchangeRate` type
+- Change `getExchangeRate` method to return '0' value for non-valid exchange rate
 - Change `Balances` type to store available and on hold balances in new `Balance` type
 - Create `BalancesType` type to store available or on hold balances
 - Remove `isReturnInNanos` and `isForce` parameters from `getBalances` and `getBalance` methods
