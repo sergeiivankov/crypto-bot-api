@@ -110,4 +110,4 @@ $ npm run lint
 
 ## License
 
-[MIT](https://github.com/sergeiivankov/crypto-bot-api/blob/main/licanse)
+[MIT](https://github.com/sergeiivankov/crypto-bot-api/blob/main/license)
