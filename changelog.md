@@ -3,6 +3,7 @@
 ## Unreleased changes
 
 - Added ability to create HTTP server, not only HTTPS
+- Change empty request body error response code to `401`
 - Readme fixes
 
 Thanks:

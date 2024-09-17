@@ -250,7 +250,7 @@ class ClientEmitter extends Client {
    */
   private _handleWebhook(data: any, req: IncomingMessage, res: ServerResponse): void {
     if (!data) {
-      res.statusCode = 500;
+      res.statusCode = 401;
       res.end();
       return;
     }
