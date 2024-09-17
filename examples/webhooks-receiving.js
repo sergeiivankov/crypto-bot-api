@@ -7,8 +7,8 @@ const onPaid = (invoice, requestDate) => {
   console.log(requestDate, invoice);
 };
 
-// Important: at the time of publication of version 0.3.0 (Sep 16, 2024),
-// API servers do not accept self-signed certificates
+// Important: if you want to use self-signed certificate
+// you must uploat it in CryptoBot API application settings
 client.createServer({
   key: readFileSync(__dirname + '/server.key'),
   cert: readFileSync(__dirname + '/server.cert')

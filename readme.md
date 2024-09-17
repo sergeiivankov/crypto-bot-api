@@ -61,7 +61,7 @@ Crypto Pay API support events by sending webhooks requests. To handle webhooks r
 
 *Note: you need enable webhooks in CryptoBot app settings.*
 
-**Important: at the time of publication of version 0.3.0 (Sep 16, 2024), API servers do not accept self-signed certificates**
+**Important: if you want to use self-signed certificate you must uploat it in CryptoBot API application settings**
 
 ## Documentation
 
