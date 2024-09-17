@@ -2,6 +2,7 @@
 
 ## Unreleased changes
 
+- Fix export types
 - Readme fixes
 
 ## 0.3.1 - 2024-09-17

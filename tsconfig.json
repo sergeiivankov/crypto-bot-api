@@ -10,7 +10,7 @@
     "src/**/*"
   ],
   "typedocOptions": {
-    "entryPoints": ["src/exports.ts"],
+    "entryPoints": ["src/types.ts"],
     "out": "docs",
     "name": "Crypto Bot API",
     "hideGenerator": true,
