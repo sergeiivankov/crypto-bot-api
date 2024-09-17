@@ -1,10 +1,11 @@
 # Changelog
 
-## Unreleased changes
+## 0.3.1 - 2024-09-17
 
 - Added ability to create HTTP server, not only HTTPS
 - Change empty request body error response code to `401`
 - Readme fixes
+- Update dependencies
 
 Thanks:
 

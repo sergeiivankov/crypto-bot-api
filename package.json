@@ -1,6 +1,6 @@
 {
   "name": "crypto-bot-api",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Simple and minimalistic client for Telegram CryptoBot Crypto Pay API",
   "author": "Sergei Ivankov <sergeiivankov@pm.me>",
   "license": "MIT",
@@ -42,7 +42,7 @@
     "tslib": "^2.7.0",
     "typedoc": "^0.26.7",
     "typescript": "^5.6.2",
-    "typescript-eslint": "^8.5.0"
+    "typescript-eslint": "^8.6.0"
   },
   "keywords": [
     "crypto-bot-api",
