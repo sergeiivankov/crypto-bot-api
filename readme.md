@@ -15,16 +15,6 @@ $ yarn add crypto-bot-api
 
 For browsers use bundles from `dist` directory or add package to your project dependencies and import it.
 
-## Supported environments
-
-- \>= Node.js 12
-- \>= Chrome 32
-- \>= Firefox 29
-- \>= Edge 12
-- \>= Safari 8
-- \>= Safari on iOS 8
-- \> Android Browser 4.4.4
-
 ## Usage
 
 In Node.js:
@@ -57,7 +47,7 @@ More usage examples see in [examples](https://github.com/sergeiivankov/crypto-bo
 
 ## Receiving updates
 
-Crypto Pay API support events by sending webhooks requests. To handle webhooks request library proposes to use [creating Node.js built-in HTTPS server](https://sergeiivankov.github.io/crypto-bot-api/classes/ClientEmitter.html#createServer) or [using Express.js-like middleware API](https://sergeiivankov.github.io/crypto-bot-api/classes/ClientEmitter.html#middleware). See [examples](https://github.com/sergeiivankov/crypto-bot-api/tree/main/examples) with names starts with `webhooks-`.
+Crypto Pay API support events by sending webhooks requests. To handle webhooks request library proposes to use [creating Node.js built-in HTTP or HTTPS server](https://sergeiivankov.github.io/crypto-bot-api/classes/ClientEmitter.html#createServer) or [using Express.js-like middleware API](https://sergeiivankov.github.io/crypto-bot-api/classes/ClientEmitter.html#middleware). See [examples](https://github.com/sergeiivankov/crypto-bot-api/tree/main/examples) with names starts with `webhooks-`.
 
 *Note: you need enable webhooks in CryptoBot app settings, if you want to use self-signed certificate you must uploat it in CryptoBot API application settings*
 
@@ -105,6 +95,16 @@ To maintain high quality of the code and bring source code to a consistent form,
 ```bash
 $ npm run lint
 ```
+
+## Supported environments
+
+- \>= Node.js 12
+- \>= Chrome 32
+- \>= Firefox 29
+- \>= Edge 12
+- \>= Safari 8
+- \>= Safari on iOS 8
+- \> Android Browser 4.4.4
 
 ## License
 

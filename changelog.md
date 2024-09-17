@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased changes
+
+- Readme fixes
+
 ## 0.3.1 - 2024-09-17
 
 - Added ability to create HTTP server, not only HTTPS
