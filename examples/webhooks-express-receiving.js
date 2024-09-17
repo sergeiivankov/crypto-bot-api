@@ -10,7 +10,7 @@ client.on('paid', (invoice, requestDate) => {
   console.log(requestDate, invoice);
 });
 
-app.use('/secret', client.middleware());
+app.use('/secret-webhooks-path', client.middleware());
 
 // Note: if you want to use self-signed certificate
 // you must uploat it in CryptoBot API application settings

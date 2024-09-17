@@ -1,7 +1,9 @@
 import { createHash, createHmac } from 'crypto';
 import { ListenOptions } from 'net';
-import { IncomingMessage, RequestListener, ServerResponse } from 'http';
-import { Server, ServerOptions, createServer } from 'https';
+import { IncomingMessage, RequestListener, ServerResponse, Server, createServer } from 'http';
+import {
+  Server as SecureServer, ServerOptions, createServer as createSecureServer,
+} from 'https';
 import Client from './Client';
 import { Invoice, toInvoice } from '../helpers/casts';
 import { Middleware } from '../helpers/utils';
@@ -100,7 +102,7 @@ class ClientEmitter extends Client {
    * @returns Promise, what resolved `void`
    */
   createServer(
-    serverOptions: ServerOptions, secretPath: string = '/',
+    serverOptions: ServerOptions & { http: boolean }, secretPath: string = '/',
     listenOptions: ListenOptions = { port: 443 },
   ): Promise<void> {
     return new Promise((resolve, reject) => {
@@ -114,9 +116,11 @@ class ClientEmitter extends Client {
         readRequestBody(req).then((data: any): void => this._handleWebhook(data, req, res));
       };
 
-      let server: Server;
+      let server: Server | SecureServer;
       try {
-        server = createServer(serverOptions, requestListener);
+        server = serverOptions.http === true
+          ? createServer(serverOptions, requestListener)
+          : createSecureServer(serverOptions, requestListener);
       } catch (err) {
         reject(err);
         return;

@@ -41,8 +41,8 @@ declare class ClientEmitter extends Client {
     /**
      * Create handling webhooks server
      *
-     * Important: at the time of publication of version 0.3.0 (Sep 16, 2024),
-     * API servers do not accept self-signed certificates
+     * Note: if you want to use self-signed certificate
+     * you must uploat it in CryptoBot API application settings
      *
      * @param serverOptions - Node.js built-in server options
      * @param secretPath - Webhooks secret path, processing webhooks takes place only on it
@@ -52,7 +52,9 @@ declare class ClientEmitter extends Client {
      *
      * @returns Promise, what resolved `void`
      */
-    createServer(serverOptions: ServerOptions, secretPath?: string, listenOptions?: ListenOptions): Promise<void>;
+    createServer(serverOptions: ServerOptions & {
+        http: boolean;
+    }, secretPath?: string, listenOptions?: ListenOptions): Promise<void>;
     /**
      * Close created handling webhooks server
      *

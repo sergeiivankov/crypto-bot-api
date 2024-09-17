@@ -2,7 +2,12 @@
 
 ## Unreleased changes
 
+- Added ability to create HTTP server, not only HTTPS
 - Readme fixes
+
+Thanks:
+
+- [Nikita](https://github.com/asymptotee)
 
 ## 0.3.0 - 2024-09-16
 

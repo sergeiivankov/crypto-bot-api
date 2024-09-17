@@ -7,6 +7,10 @@ const onPaid = (invoice, requestDate) => {
   console.log(requestDate, invoice);
 };
 
+// If you app work behind proxy and no need create HTTPS server,
+// no pass `key` and `cert` fields and add `http` field with `true` value:
+// { http: true }
+//
 // Note: if you want to use self-signed certificate
 // you must uploat it in CryptoBot API application settings
 client.createServer({
