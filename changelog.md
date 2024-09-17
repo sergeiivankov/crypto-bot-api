@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased changes
+
+- Readme fixes
+
 ## 0.3.0 - 2024-09-16
 
 - Add `getStats`, `createCheck`, `getChecks`, `getChecksPaginate`, `transfer`, `getTransfers`, `getTransfersPaginate`, `deleteInvoice` and `deleteCheck` methods

@@ -1,6 +1,6 @@
-# Crypto Bot API
+# Crypto Bot API - client library for Crypto Pay API
 
-Simple and minimalistic client for Telegram [CryptoBot](https://t.me/CryptoBot) Crypto Pay API.
+Written in TypeScript up-to-date client library for Crypto Pay API provided by Telegram [CryptoBot](https://t.me/CryptoBot).
 
 ## Installing
 
@@ -59,9 +59,7 @@ More usage examples see in [examples](https://github.com/sergeiivankov/crypto-bo
 
 Crypto Pay API support events by sending webhooks requests. To handle webhooks request library proposes to use [creating Node.js built-in HTTPS server](https://sergeiivankov.github.io/crypto-bot-api/classes/ClientEmitter.html#createServer) or [using Express.js-like middleware API](https://sergeiivankov.github.io/crypto-bot-api/classes/ClientEmitter.html#middleware). See [examples](https://github.com/sergeiivankov/crypto-bot-api/tree/main/examples) with names starts with `webhooks-`.
 
-*Note: you need enable webhooks in CryptoBot app settings.*
-
-**Important: if you want to use self-signed certificate you must uploat it in CryptoBot API application settings**
+*Note: you need enable webhooks in CryptoBot app settings, if you want to use self-signed certificate you must uploat it in CryptoBot API application settings*
 
 ## Documentation
 
