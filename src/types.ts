@@ -10,3 +10,6 @@ export * from './helpers/casts';
 export * from './helpers/utils';
 export { default as requestHttp } from './request/http';
 export { default as requestXhr } from './request/xhr';
+
+import ClientEmitter from './classes/ClientEmitter';
+export default ClientEmitter;
