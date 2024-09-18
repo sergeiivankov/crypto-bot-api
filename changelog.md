@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased changes
+## 0.3.3 - 2024-09-18
 
 - Fix default export type
 
