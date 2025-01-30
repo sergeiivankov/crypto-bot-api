@@ -16,17 +16,16 @@ export type BalancesType = { [variant in CryptoCurrencyCode]: string };
 
 // Crypto currency codes
 export type CryptoCurrencyCode =
-  'USDT' | 'TON' | 'BTC' | 'ETH' | 'LTC' | 'BNB' | 'TRX' | 'USDC' | 'JET';
+  'USDT' | 'TON' | 'GRAM' | 'NOT' | 'MY' | 'DOGS' | 'BTC' | 'LTC' | 'ETH' | 'BNB' | 'TRX' | 'WIF' |
+  'USDC' | 'TRUMP' | 'MELANIA' | 'SOL' | 'DOGE' | 'PEPE' | 'BONK' | 'MAJOR' | 'HMSTR' | 'CATI';
 
 // Fiat currency codes
 export type FiatCurrencyCode =
   'USD' | 'EUR' | 'RUB' | 'BYN' | 'UAH' | 'GBP' | 'CNY' | 'KZT' | 'UZS' | 'GEL' | 'TRY' | 'AMD' |
-  'THB' | 'INR' | 'BRL' | 'IDR' | 'AZN' | 'AED' | 'PLN' | 'ILS';
+  'THB' | 'INR' | 'BRL' | 'IDR' | 'AZN' | 'AED' | 'PLN' | 'ILS' | 'KGS' | 'TJS';
 
-// All curerencies codes, `getCurrencies` API method return also 'KGS' and 'TJS' fiat currencies,
-// so I add it's here
-// TODO: check availability of creating invoices with this currencies
-export type CurrencyCode = CryptoCurrencyCode | FiatCurrencyCode | 'KGS' | 'TJS';
+// All curerencies codes
+export type CurrencyCode = CryptoCurrencyCode | FiatCurrencyCode;
 
 /** Possible currency types */
 export enum CurrencyType {

@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased changes
+
+- Add new support currencies codes to types
+
+Thanks:
+
+- [Ryuko](https://github.com/helloryuko)
+
 ## 0.3.3 - 2024-09-18
 
 - Fix default export type
