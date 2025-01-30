@@ -12,9 +12,9 @@ export type Balances = {
 export type BalancesType = {
     [variant in CryptoCurrencyCode]: string;
 };
-export type CryptoCurrencyCode = 'USDT' | 'TON' | 'BTC' | 'ETH' | 'LTC' | 'BNB' | 'TRX' | 'USDC' | 'JET';
-export type FiatCurrencyCode = 'USD' | 'EUR' | 'RUB' | 'BYN' | 'UAH' | 'GBP' | 'CNY' | 'KZT' | 'UZS' | 'GEL' | 'TRY' | 'AMD' | 'THB' | 'INR' | 'BRL' | 'IDR' | 'AZN' | 'AED' | 'PLN' | 'ILS';
-export type CurrencyCode = CryptoCurrencyCode | FiatCurrencyCode | 'KGS' | 'TJS';
+export type CryptoCurrencyCode = 'USDT' | 'TON' | 'GRAM' | 'NOT' | 'MY' | 'DOGS' | 'BTC' | 'LTC' | 'ETH' | 'BNB' | 'TRX' | 'WIF' | 'USDC' | 'TRUMP' | 'MELANIA' | 'SOL' | 'DOGE' | 'PEPE' | 'BONK' | 'MAJOR' | 'HMSTR' | 'CATI';
+export type FiatCurrencyCode = 'USD' | 'EUR' | 'RUB' | 'BYN' | 'UAH' | 'GBP' | 'CNY' | 'KZT' | 'UZS' | 'GEL' | 'TRY' | 'AMD' | 'THB' | 'INR' | 'BRL' | 'IDR' | 'AZN' | 'AED' | 'PLN' | 'ILS' | 'KGS' | 'TJS';
+export type CurrencyCode = CryptoCurrencyCode | FiatCurrencyCode;
 /** Possible currency types */
 export declare enum CurrencyType {
     Crypto = "crypto",

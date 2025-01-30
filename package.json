@@ -1,6 +1,6 @@
 {
   "name": "crypto-bot-api",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "Simple and minimalistic client for Telegram CryptoBot Crypto Pay API",
   "author": "Sergei Ivankov <sergeiivankov@pm.me>",
   "license": "MIT",

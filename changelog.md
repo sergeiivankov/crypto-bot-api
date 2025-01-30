@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased changes
+## 0.3.4 - 2025-01-30
 
 - Add new support currencies codes to types
 
