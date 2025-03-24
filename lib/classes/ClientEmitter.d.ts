@@ -56,7 +56,7 @@ declare class ClientEmitter extends Client {
      * @returns Promise, what resolved `void`
      */
     createServer(serverOptions: ServerOptions & {
-        http: boolean;
+        http?: boolean;
     }, secretPath?: string, listenOptions?: ListenOptions): Promise<void>;
     /**
      * Close created handling webhooks server
@@ -80,14 +80,14 @@ declare class ClientEmitter extends Client {
      * @param event - `paid` event name
      * @param listener - Event listener with `invoice` and `requestDate` callback parameters
      */
-    on(event: 'paid', listener: (invoice?: Invoice, requestDate?: Date) => any): void;
+    on(event: 'paid', listener: (invoice: Invoice, requestDate: Date) => any): void;
     /**
      * Unsubscribes from `paid` event
      *
      * @param event - `paid` event name
      * @param listener - Event listener with `invoice` and `requestDate` callback parameters
      */
-    off(event: 'paid', listener: (invoice?: Invoice, requestDate?: Date) => any): void;
+    off(event: 'paid', listener: (invoice: Invoice, requestDate: Date) => any): void;
     /**
      * Emit event to listeners
      *

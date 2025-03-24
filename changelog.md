@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased changes
+## 0.3.5 - 2025-03-24
 
 - Add new support `MEMHASH` currency code to types
 - Fix `paid` event arguments optional status
