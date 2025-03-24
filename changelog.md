@@ -6,6 +6,7 @@
 - Fix `paid` event arguments optional status
 - Fix `http` create server field required status
 - Update dependencies, fix build config
+- Add `TypeScript` examples, fix examples errors
 
 ## 0.3.4 - 2025-01-30
 
