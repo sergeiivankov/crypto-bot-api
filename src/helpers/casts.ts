@@ -17,7 +17,7 @@ export type BalancesType = { [variant in CryptoCurrencyCode]: string };
 // Crypto currency codes
 export type CryptoCurrencyCode =
   'USDT' | 'TON' | 'GRAM' | 'NOT' | 'MY' | 'DOGS' | 'BTC' | 'LTC' | 'ETH' | 'BNB' | 'TRX' | 'WIF' |
-  'USDC' | 'TRUMP' | 'MELANIA' | 'SOL' | 'DOGE' | 'PEPE' | 'BONK' | 'MAJOR' | 'HMSTR' | 'CATI';
+  'USDC' | 'TRUMP' | 'MELANIA' | 'SOL' | 'DOGE' | 'PEPE' | 'BONK' | 'MAJOR' | 'HMSTR' | 'CATI' | 'MEMHASH';
 
 // Fiat currency codes
 export type FiatCurrencyCode =

@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased changes
+
+ - Add new support `MEMHASH` currency code to types
+
 ## 0.3.4 - 2025-01-30
 
 - Add new support currencies codes to types
