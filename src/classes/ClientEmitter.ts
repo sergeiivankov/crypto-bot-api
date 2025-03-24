@@ -181,7 +181,7 @@ class ClientEmitter extends Client {
    * @param event - `paid` event name
    * @param listener - Event listener with `invoice` and `requestDate` callback parameters
    */
-  on(event: 'paid', listener: (invoice?: Invoice, requestDate?: Date) => any): void;
+  on(event: 'paid', listener: (invoice: Invoice, requestDate: Date) => any): void;
 
   /**
    * Subscribes to event
@@ -200,7 +200,7 @@ class ClientEmitter extends Client {
    * @param event - `paid` event name
    * @param listener - Event listener with `invoice` and `requestDate` callback parameters
    */
-  off(event: 'paid', listener: (invoice?: Invoice, requestDate?: Date) => any): void;
+  off(event: 'paid', listener: (invoice: Invoice, requestDate: Date) => any): void;
 
   /**
    * Unsubscribes from event
