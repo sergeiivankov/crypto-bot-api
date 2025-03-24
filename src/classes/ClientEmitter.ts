@@ -105,7 +105,7 @@ class ClientEmitter extends Client {
    * @returns Promise, what resolved `void`
    */
   createServer(
-    serverOptions: ServerOptions & { http: boolean }, secretPath: string = '/',
+    serverOptions: ServerOptions & { http?: boolean }, secretPath: string = '/',
     listenOptions: ListenOptions = { port: 443 },
   ): Promise<void> {
     return new Promise((resolve, reject) => {
