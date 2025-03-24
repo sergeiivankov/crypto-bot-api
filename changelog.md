@@ -2,7 +2,8 @@
 
 ## Unreleased changes
 
- - Add new support `MEMHASH` currency code to types
+- Add new support `MEMHASH` currency code to types
+- Update dependencies, fix build config
 
 ## 0.3.4 - 2025-01-30
 

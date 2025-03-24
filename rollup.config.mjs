@@ -15,6 +15,7 @@ const plugins = [
       target: 'es5',
       sourceMap: true,
       declaration: false,
+      outDir: './dist',
     },
   }),
 ];
