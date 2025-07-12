@@ -1,4 +1,4 @@
-import { CurrencyType, CryptoCurrencyCode, FiatCurrencyCode, InvoiceStatus, CheckStatus, ExchangeRates } from './casts';
+import { CurrencyType, CryptoCurrencyCode, SwappableTargetCurrencies, FiatCurrencyCode, InvoiceStatus, CheckStatus, ExchangeRates } from './casts';
 /** Possible backend API methods names */
 export type ApiMethod = 'getMe' | 'getStats' | 'createInvoice' | 'createCheck' | 'deleteInvoice' | 'deleteCheck' | 'getInvoices' | 'getChecks' | 'getBalance' | 'getExchangeRates' | 'getCurrencies' | 'transfer' | 'getTransfers';
 /** Options object type for {@link Client.getStats} method */
@@ -89,6 +89,8 @@ export type CreateInvoiceOptions = {
     currencyType?: CurrencyType.Crypto | CurrencyType.Fiat;
     /** Invoice asset */
     asset?: CryptoCurrencyCode;
+    /** Asset that will be attempted to be swapped into after the user makes a payment */
+    swapTo?: SwappableTargetCurrencies;
     /** Invoice fiat */
     fiat?: FiatCurrencyCode;
     /** List of cryptocurrency alphabetic codes */
@@ -121,6 +123,8 @@ export type CreateInvoiceBackendOptions = {
     currency_type?: CurrencyType.Crypto | CurrencyType.Fiat;
     /** Invoice asset */
     asset?: CryptoCurrencyCode;
+    /** Asset that will be attempted to be swapped into after the user makes a payment */
+    swap_to?: SwappableTargetCurrencies;
     /** Invoice fiat */
     fiat?: FiatCurrencyCode;
     /** List of cryptocurrency alphabetic codes separated comma */

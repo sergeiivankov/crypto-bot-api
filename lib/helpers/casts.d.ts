@@ -13,6 +13,7 @@ export type BalancesType = {
     [variant in CryptoCurrencyCode]: string;
 };
 export type CryptoCurrencyCode = 'USDT' | 'TON' | 'GRAM' | 'NOT' | 'MY' | 'DOGS' | 'BTC' | 'LTC' | 'ETH' | 'BNB' | 'TRX' | 'WIF' | 'USDC' | 'TRUMP' | 'MELANIA' | 'SOL' | 'DOGE' | 'PEPE' | 'BONK' | 'MAJOR' | 'HMSTR' | 'CATI' | 'MEMHASH';
+export type SwappableTargetCurrencies = 'USDT' | 'TON' | 'TRX' | 'ETH' | 'SOL' | 'BTC' | 'LTC';
 export type FiatCurrencyCode = 'USD' | 'EUR' | 'RUB' | 'BYN' | 'UAH' | 'GBP' | 'CNY' | 'KZT' | 'UZS' | 'GEL' | 'TRY' | 'AMD' | 'THB' | 'INR' | 'BRL' | 'IDR' | 'AZN' | 'AED' | 'PLN' | 'ILS' | 'KGS' | 'TJS';
 export type CurrencyCode = CryptoCurrencyCode | FiatCurrencyCode;
 /** Possible currency types */
@@ -230,6 +231,25 @@ export type Invoice = {
      * only if currency type is CurrencyType.Fiat and status is InvoiceStatus.Paid
      */
     paidFiatRate?: number;
+    /** The asset that will be attempted to be swapped into after the user makes a payment */
+    swapTo?: SwappableTargetCurrencies;
+    /** For invoices with the "paid" status, this flag indicates whether the swap was successful */
+    isSwapped?: boolean;
+    /** If is_swapped is true, stores the unique identifier of the swap */
+    swappedUid?: string;
+    /** If is_swapped is true, stores the asset into which the swap was made */
+    swappedTo?: SwappableTargetCurrencies;
+    /** If is_swapped is true, stores the exchange rate at which the swap was executed */
+    swappedRate?: number;
+    /**
+     * If is_swapped is true, stores the amount received as a result of the swap(in the swapped_to
+     * asset)
+     */
+    swappedOutput?: string;
+    /** If is_swapped is true, stores the resulting swap amount in USD */
+    swappedUsdAmount?: string;
+    /** If is_swapped is true, stores the USD exchange rate of the currency from swapped_to */
+    swappedUsdRate?: number;
 };
 /** Result type object for {@link Client.getStats} method */
 export type Stats = {

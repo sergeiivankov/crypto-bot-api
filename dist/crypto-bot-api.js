@@ -214,6 +214,18 @@ var CryptoBotAPI = (function () {
             }
             invoice.payload = payload;
         }
+        if (input.swap_to !== undefined) {
+            invoice.swapTo = input.swap_to;
+            invoice.isSwapped = input.is_swapped;
+            if (invoice.isSwapped) {
+                invoice.swappedUid = input.swapped_uid || '';
+                invoice.swappedTo = input.swapped_to || '';
+                invoice.swappedRate = parseFloat(input.swapped_rate) || 0;
+                invoice.swappedOutput = input.swapped_output || '';
+                invoice.swappedUsdAmount = input.swapped_usd_amount || '';
+                invoice.swappedUsdRate = parseFloat(input.swapped_usd_rate) || 0;
+            }
+        }
         return invoice;
     };
     /**
@@ -529,6 +541,8 @@ var CryptoBotAPI = (function () {
         if (payload !== undefined)
             prepared.payload = payload;
         // Different names
+        if (options.swapTo !== undefined)
+            prepared.swap_to = options.swapTo;
         if (options.paidBtnUrl !== undefined)
             prepared.paid_btn_url = options.paidBtnUrl;
         if (options.paidBtnName !== undefined)

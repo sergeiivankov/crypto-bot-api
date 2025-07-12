@@ -41,7 +41,7 @@ In browsers:
 </script>
 ```
 
-**Important: at the time of publication of version 0.3.5 (Mar 24, 2025), API servers do not return header Access-Control-Allow-Origin, which allows make requests to API from third-party domains, so client request from website environment won't work (but its work in browser extensions, Electron and similar apps)**
+**Important: at the time of publication of version 0.3.6 (Jul 12, 2025), API servers do not return header Access-Control-Allow-Origin, which allows make requests to API from third-party domains, so client request from website environment won't work (but its work in browser extensions, Electron and similar apps)**
 
 More usage examples see in [examples](https://github.com/sergeiivankov/crypto-bot-api/tree/main/examples) project directory.
 
