@@ -19,6 +19,9 @@ export type CryptoCurrencyCode =
   'USDT' | 'TON' | 'GRAM' | 'NOT' | 'MY' | 'DOGS' | 'BTC' | 'LTC' | 'ETH' | 'BNB' | 'TRX' | 'WIF' |
   'USDC' | 'TRUMP' | 'MELANIA' | 'SOL' | 'DOGE' | 'PEPE' | 'BONK' | 'MAJOR' | 'HMSTR' | 'CATI' | 'MEMHASH';
 
+// Crypto currency codes  available for passing in `swapTo` field
+export type SwappableTargetCurrencies = 'USDT' | 'TON' | 'TRX' | 'ETH' | 'SOL' | 'BTC' | 'LTC';
+
 // Fiat currency codes
 export type FiatCurrencyCode =
   'USD' | 'EUR' | 'RUB' | 'BYN' | 'UAH' | 'GBP' | 'CNY' | 'KZT' | 'UZS' | 'GEL' | 'TRY' | 'AMD' |
@@ -251,6 +254,25 @@ export type Invoice = {
    * only if currency type is CurrencyType.Fiat and status is InvoiceStatus.Paid
    */
   paidFiatRate?: number,
+  /** The asset that will be attempted to be swapped into after the user makes a payment */
+  swapTo?: SwappableTargetCurrencies,
+  /** For invoices with the "paid" status, this flag indicates whether the swap was successful */
+  isSwapped?: boolean,
+  /** If is_swapped is true, stores the unique identifier of the swap */
+  swappedUid?: string,
+  /** If is_swapped is true, stores the asset into which the swap was made */
+  swappedTo?: SwappableTargetCurrencies,
+  /** If is_swapped is true, stores the exchange rate at which the swap was executed */
+  swappedRate?: number,
+  /**
+   * If is_swapped is true, stores the amount received as a result of the swap(in the swapped_to
+   * asset)
+   */
+  swappedOutput?: string,
+  /** If is_swapped is true, stores the resulting swap amount in USD */
+  swappedUsdAmount?: string,
+  /** If is_swapped is true, stores the USD exchange rate of the currency from swapped_to */
+  swappedUsdRate?: number,
 };
 
 /** Result type object for {@link Client.getStats} method */
@@ -412,6 +434,20 @@ export const toInvoice = (input: any): Invoice => {
     }
 
     invoice.payload = payload;
+  }
+
+  if (input.swap_to !== undefined) {
+    invoice.swapTo = input.swap_to;
+    invoice.isSwapped = input.is_swapped;
+
+    if (invoice.isSwapped) {
+      invoice.swappedUid = input.swapped_uid || '';
+      invoice.swappedTo = input.swapped_to || '';
+      invoice.swappedRate = parseFloat(input.swapped_rate) || 0;
+      invoice.swappedOutput = input.swapped_output || '';
+      invoice.swappedUsdAmount = input.swapped_usd_amount || '';
+      invoice.swappedUsdRate = parseFloat(input.swapped_usd_rate) || 0;
+    }
   }
 
   return invoice;

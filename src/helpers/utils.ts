@@ -1,5 +1,6 @@
 import {
-  CurrencyType, CryptoCurrencyCode, FiatCurrencyCode, InvoiceStatus, CheckStatus, ExchangeRates,
+  CurrencyType, CryptoCurrencyCode, SwappableTargetCurrencies, FiatCurrencyCode, InvoiceStatus,
+  CheckStatus, ExchangeRates,
 } from './casts';
 
 /** Possible backend API methods names */
@@ -102,6 +103,8 @@ export type CreateInvoiceOptions = {
   currencyType?: CurrencyType.Crypto | CurrencyType.Fiat,
   /** Invoice asset */
   asset?: CryptoCurrencyCode,
+  /** Asset that will be attempted to be swapped into after the user makes a payment */
+  swapTo?: SwappableTargetCurrencies,
   /** Invoice fiat */
   fiat?: FiatCurrencyCode,
   /** List of cryptocurrency alphabetic codes */
@@ -135,6 +138,8 @@ export type CreateInvoiceBackendOptions = {
   currency_type?: CurrencyType.Crypto | CurrencyType.Fiat,
   /** Invoice asset */
   asset?: CryptoCurrencyCode,
+  /** Asset that will be attempted to be swapped into after the user makes a payment */
+  swap_to?: SwappableTargetCurrencies,
   /** Invoice fiat */
   fiat?: FiatCurrencyCode,
   /** List of cryptocurrency alphabetic codes separated comma */
@@ -527,6 +532,7 @@ export const prepareCreateInvoiceOptions = (
   if (payload !== undefined) prepared.payload = payload;
 
   // Different names
+  if (options.swapTo !== undefined) prepared.swap_to = options.swapTo;
   if (options.paidBtnUrl !== undefined) prepared.paid_btn_url = options.paidBtnUrl;
   if (options.paidBtnName !== undefined) prepared.paid_btn_name = options.paidBtnName;
   if (options.isAllowComments !== undefined) prepared.allow_comments = options.isAllowComments;
